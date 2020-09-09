@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="735a2159-6e1e-4bb0-b725-7d3a1dfda60b" name="turbik" url="http://turbodigital.su">
+        <fileTransfer rootFolder="/home/bitrix/www" accessType="SFTP" host="192.168.3.37" port="22" sshConfigId="bcd66ed8-4c1b-437a-8859-a7d698e877cf" sshConfig="root@192.168.3.37:22 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
