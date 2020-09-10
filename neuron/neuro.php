@@ -2,12 +2,17 @@
 
 define("COUNT_SLOY", 2);
 define("COUNT_ON_SLOY", 2);
-define("COUNT_OUTPUTS", 2);
+define("COUNT_OUTPUTS", 1);
 
-define("TEACH_KOEF", 0.1);
+define("TEACH_KOEF", 0.3);
+define("TEACH_KOEF2", 0.65);
 
 global $isTeach;
-$isTeach= true;
+$isTeach = true;
+
+global $answers, $ethalons;
+$answers = array();
+$ethalons = array();
 
 //$x = array(1, 0);
 
@@ -15,78 +20,140 @@ global $dopWeight;
 
 $dopWeight = array();
 
+//$weights = array(
+//    "w111" => 0.13,
+//    "w121" => -0.34,
+//    "w211" => -0.42,
+//    "w221" => 0.38,
+//    "w112" => 0.25,
+//    "w122" => 0.07,
+//    "w212" => -0.20,
+//    "w222" => 0.32,
+//    "w113" => -0.41,
+//    "w213" => 0.12,
+////    "w123" => 0.41,
+////    "w223" => -0.12,
+//);
+
+
 $weights = array(
-    "w111" => 0.13,
-    "w121" => -0.34,
-    "w211" => -0.42,
-    "w221" => 0.38,
-    "w112" => 0.25,
-    "w122" => 0.07,
-    "w212" => -0.20,
-    "w222" => 0.32,
-    "w113" => -0.41,
-    "w213" => 0.12,
-    "w123" => 0.41,
-    "w223" => -0.12,
+  "w111" => 0.5,
+  "w112" => -0.1,
+  "w113" => 0.2,
+  "w121" => 0.3,
+  "w122" => -0.23,
+  "w123" => 0.43,
+  "w211" => 0.33,
+  "w212" => -0.4,
+  "w221" => -0.5,
+  "w222" => 0.2,
+  "w311" => -0.49,
+  "w312" => 0.39,
 );
+
 //$weights = array();
 ksort($weights);
 //pre($weights);
 
-pre(startEpoch($weights, array(1, 0), array(1, 1)));
-//pre(startEpoch($weights, array(0, 0, 0), array(1, 0)));
-//pre(startEpoch($weights, array(0, 0, 1), array(1, 0)));
-//pre(startEpoch($weights, array(0, 1, 0), array(1, 0)));
-//pre(startEpoch($weights, array(0, 1, 1), array(0, 1)));
-//pre(startEpoch($weights, array(1, 0, 0), array(1, 0)));
-//pre(startEpoch($weights, array(1, 0, 1), array(0, 1)));
-//pre(startEpoch($weights, array(1, 1, 0), array(0, 1)));
-//pre(startEpoch($weights, array(1, 1, 1), array(0, 1)));
+//for ($i = 0; $i < 10; $i++) {
+//    pre(startEpoch($weights, array(1, 0), array(1)));
+    pre(startEpoch($weights, array(2, 1, 3), array(1)));
+    pre(startEpoch($weights, array(1, 2, 1), array(0.5)));
+    pre(startEpoch($weights, array(3, 2, 1), array(1)));
+    pre(startEpoch($weights, array(1, 3, 2), array(0.5)));
+//}
+
+
+
+pre($weights);
+
+
+//pre($answers);
+
+//$er = calcError($answers, $ethalons);
+
+//pre($er);
+
+
 
 //$isTeach = false;
-//pre(startEpoch($weights, array(1, 1, 1)));
+//pre(startEpoch($weights, array(0, 0, 1)));
 
 
 
 
-function startEpoch(&$weights, $x, $e = 0)
+
+
+function startEpoch(&$weights, $x, $eth = 0)
 {
     global $isTeach;
-    $bigSs = array();
+//    $bigSs = array();
     $fs = array();
     generateX($x, $fs);
-    $sOut = firstForward($weights, $x, $bigSs, $fs);
+    $sOut = firstForward($weights, $x, $fs/*, $bigSs*/);
+
+    global $answers, $ethalons;
+//    $answers[] = number_format($sOut, 9);
+    $answers[] = $sOut;
+    $ethalons[] = $eth;
+
+    pre($answers);
+    pre($ethalons);
+
+    if(!$isTeach) {
+        return $sOut;
+    }
+
+//    pre($sOut, 1);
+
 //    ksort($weights);
 //    pre($weights);
 
     foreach ($sOut as $k => $value) {
-        $p = calcFa($value);
-        $y["y" . $k] = $p;
+        $proiz = calcProizvod($value);
 
-        if ($isTeach) {
-            $fs["f" . (COUNT_SLOY + 1) . $k] = $p;
-//            pre($e[$k - 1]);
+//        pre($value);
+
+//        pre($p, 1);
+
+//        $y["y" . $k] = $p;
+
+//        if ($isTeach) {
+//            $fs["f" . (COUNT_SLOY + 1) . $k] = $proiz;
+//            pre($eth[$k - 1]);
 //            pre($p);
-            $ds["d" . (COUNT_SLOY + 1) . ($k)] = $e[$k - 1] - $p;
+
+            $d = $value - $eth[$k];
+
+//            pre($d, 1);
+
+            $ds["d" . (COUNT_SLOY + 1) . ($k + 1)] = $d * $proiz;
 //            pre($ds["d" . (COUNT_SLOY + 1) . ($k)]);
-        }
+//        }
     }
 
+//    pre($ds, 1);
+
+//    pre($fs, 1);
 
     if ($isTeach) {
-        calcErrors($ds, $weights);
-
+        calcErrors($ds, $weights, $fs);
+//
+//        pre($weights);
         $newWeights = weightCorrection($weights, $x, $fs, $ds);
-        ksort($newWeights);
-//        pre($weights);
+//
+//        ksort($newWeights);
+////        pre($weights);
         $weights = $newWeights;
-        unset($newWeights);
+//        unset($newWeights);
 //        pre($weights);
+////        pre("--------------------------------");
+//        return $y;
+    }
+//    else
+//        return $y;
 
-//        pre($y, 1);
-        return $y;
-    } else
-        return $y;
+//    pre($ds, 1);
 }
 
 function generateX(&$x, &$fs)
@@ -96,7 +163,7 @@ function generateX(&$x, &$fs)
     }
 }
 
-function firstForward(&$weights, $x, &$bigSs, &$fs)
+function firstForward(&$weights, $x, &$fs, &$bigSs = array())
 {
     for ($i = 1; $i <= COUNT_SLOY; $i++) {
         for ($j = 1; $j <= COUNT_ON_SLOY; $j++) {
@@ -108,32 +175,57 @@ function firstForward(&$weights, $x, &$bigSs, &$fs)
 
             $S = 0;
             for ($k = 1; $k <= $kMax; $k++) {
-                $weightKey = "w" . $k . $j . $i;
+                $weightKey = "w". $i . $j  . $k;
+
                 if (!key_exists($weightKey, $weights)) {
                     $weights[$weightKey] = randWeight();
                 }
+//                if($i != 1) {
+//                    pre("f" . ($i - 1) . $k . ": " . $fs["f" . ($i - 1) . $k]);
+//                    pre($weightKey . ": " . $weights[$weightKey]);
+//                    pre("____________________________________");
+
+//                }
                 $S += $fs["f" . ($i - 1) . $k] * $weights[$weightKey];
 //                $S += 1 * getRandDopWeight($weightKey);
             }
+
+            //die();
 
             $bigSs["s" . $i . $j] = $S;
 
             $fs["f" . $i . $j] = calcFa($S);
         }
+        //die();
+
     }
 
+//    pre($bigSs);
+//    pre($fs, 1);
 
     for ($j = 1; $j <= COUNT_OUTPUTS; $j++) {
         $S = 0;
         for ($i = 1; $i <= COUNT_ON_SLOY; $i++) {
-            $weightKey = "w" . $i . $j . (COUNT_SLOY + 1);
+            $weightKey = "w" . (COUNT_SLOY + 1) . $j . $i;
             if (!key_exists($weightKey, $weights)) {
                 $weights[$weightKey] = randWeight();
             }
+
+//            pre("f" . COUNT_SLOY . $i . ": " . $fs["f" . COUNT_SLOY . $i]);
+//            pre($weightKey . ": " . $weights[$weightKey]);
+//            pre("____________________________________");
+
             $S += $weights[$weightKey] * $fs["f" . COUNT_SLOY . $i];
 //            $S += 1 * getRandDopWeight($weightKey);
         }
-        $y[$j] = $S;
+
+        $bigSs["s" . $i . $j] = $S;
+
+        $funAct = calcFa($S);
+
+        $fs["f". (COUNT_SLOY + 1). $j] = $funAct;
+//        $y[$j] = $funAct;
+        $y[] = $funAct;
     }
 
     return $y;
@@ -148,65 +240,115 @@ function getRandDopWeight($k) {
     return $dopWeight["d". $k];
 }
 
-function calcErrors(&$ds, $weights)
+function calcErrors(&$ds, $weights, $fs)
 {
+//    pre($ds);
     for ($i = 1; $i <= COUNT_ON_SLOY; $i++) {
+        $curD = 0;
+        $fPr = calcProizvod($fs["f" . (COUNT_SLOY) . $i]);
+//        pre("f" . (COUNT_SLOY) . $i . ":" . $fs["f" . (COUNT_SLOY) . $i]);
         for ($j = 1; $j <= COUNT_OUTPUTS; $j++) {
-//            pre($weights["w" . $i . $j . (COUNT_SLOY + 1)]);
-            $ds["d" . COUNT_SLOY . $i] = $ds["d" . (COUNT_SLOY + 1) . $j] * $weights["w" . $i . $j . (COUNT_SLOY + 1)];
-//            pre($ds["d" . COUNT_SLOY . $i]);
+//            for ($k = 1; $k <= COUNT_OUTPUTS; $k++) {
+                $d = $ds["d" . (COUNT_SLOY + 1) . $j];
+                $w = $weights["w" . (COUNT_SLOY + 1) . $j . $i];
+
+//                pre("d" . (COUNT_SLOY + 1) . $j . ":" . $d);
+//                pre("w" . (COUNT_SLOY + 1) . $j . $i . ":" . $w);
+//                pre("f" . (COUNT_SLOY) . $i . ":" . $fs["f" . (COUNT_SLOY) . $i]);
+//                pre("________________");
+
+                $curD += $d * $w * $fPr;
+//            }
+            $ds["d" . COUNT_SLOY . $i] = $curD;
         }
     }
-
-//    die();
+//    pre($ds);
 
     for ($i = COUNT_SLOY - 1; $i > 0; $i--) {
         for ($j = 1; $j <= COUNT_ON_SLOY; $j++) {
             $curD = 0;
+
+
+
+//            $w = $weights["w" . $k . $i . $j];
+//            pre("w" . (COUNT_SLOY + 1) . $j . $i . ":" . $w);
+
+
+//            pre($weights);
             for ($k = 1; $k <= COUNT_ON_SLOY; $k++) {
-                $curD += $ds["d" . ($i + 1) . $k] * $weights["w" . $j . $k . ($i + 1)];
+
+                $d = $ds["d" . ($i + 1) . $k];
+//                pre("d" . ($i + 1) . $k . ":" . $d);
+
+                $w = $weights["w" . ($i + 1) . $k . $j];
+//                pre("w" . ($i + 1) . $k . $j . ":" . $w);
+
+
+                $curD += $d * $w;
             }
+//            pre($fs);
+
+//            pre("f". $i. $j . ":" . $fs["f". $i. $j]);
+//            pre($curD);
+            $curD *= calcProizvod($fs["f". $i. $j]);
+//            die();
             $ds["d" . $i . $j] = $curD;
         }
+//        pre($ds);
     }
+//    pre($ds);
 }
 
 function weightCorrection($weights, $x, &$fs, $ds)
 {
     $newWeights = array();
 
+//    pre($ds);
     for ($i = 1; $i <= COUNT_SLOY; $i++) {
         for ($j = 1; $j <= COUNT_ON_SLOY; $j++) {
 
-            $fPr = calcProizvod($fs["f" . $i . $j]);
-
-            //перемножено здесь, а не в цикле, для ускорения
-            $multDsFPrA = $ds["d" . $i . $j] * $fPr * TEACH_KOEF;
+//            pre($ds["d" . $i . $j]);
+            $multDsA = $ds["d" . $i . $j] * TEACH_KOEF2 * (-1);
 
             if ($i == 1)
                 $kMax = count($x);
             else
                 $kMax = COUNT_ON_SLOY;
 
+
             for ($k = 1; $k <= $kMax; $k++) {
-                $w = $weights["w" . $k . $j . $i];
-                $newWeights["w" . $k . $j . $i] = $w + $multDsFPrA * $fs["f" . ($i - 1) . $k];
+
+//                pre($fs["f" . ($i - 1) . $k]);
+                $newW = $fs["f" . ($i - 1) . $k] * $multDsA;
+
+                $w = $weights["w" . $i . $j . $k];
+//                pre($w);
+                $newWeights["w" . $i . $j . $k] = $w + $newW;
             }
+
+//            die();
         }
+
     }
+//pre($weights);
+//pre($newWeights);
 
     for ($j = 1; $j <= COUNT_OUTPUTS; $j++) {
-        $fPr = calcProizvod($fs["f" . (COUNT_SLOY + 1) . $j]);
-        pre($fPr);
-        $multDsFPrA = $ds["d" . (COUNT_SLOY + 1) . $j] * $fPr * TEACH_KOEF;
+//        $fPr = calcProizvod($fs["f" . (COUNT_SLOY + 1) . $j]);
+//        $multDsFPrA = $ds["d" . (COUNT_SLOY + 1) . $j] * $fPr * TEACH_KOEF;
+
+//        pre($ds["d" . (COUNT_SLOY + 1) . $j]);
+        $multDsA = $ds["d" . (COUNT_SLOY + 1) . $j] * TEACH_KOEF2 * (-1);
 
         for ($i = 1; $i <= COUNT_ON_SLOY; $i++) {
-            $w = $weights["w" . $i . $j . (COUNT_SLOY + 1)];
-            pre($w);
-            $newWeights["w" . $i . $j . (COUNT_SLOY + 1)] = $w + $multDsFPrA * $fs["f" . COUNT_SLOY . $i];
+//            pre($fs["f" . COUNT_SLOY . $i]);
+            $newW = $fs["f" . COUNT_SLOY . $i] * $multDsA;
+            $w = $weights["w"  . (COUNT_SLOY + 1) . $j . $i];
+//            pre($w);
+            $newWeights["w"  . (COUNT_SLOY + 1) . $j . $i] = $w + $newW;
         }
     }
-
+//    pre($newWeights);
     return $newWeights;
 }
 
@@ -226,10 +368,21 @@ function randWeight()
 
 function calcFa($x)
 {
-    return 1 / (1 + exp(-$x));
+    return 1 / (1 + exp(-$x * TEACH_KOEF));
 }
 
 function calcProizvod($x)
 {
     return $x * (1 - $x);
+}
+
+function calcError($answers, $ethalons) {
+    $sum = 0;
+    foreach ($answers as $k => $answer) {
+//        pre($answers[$k]);
+//        pre($ethalons[$k]);
+        $sum += pow($answer - $ethalons[$k], 2);
+    }
+//    pre($sum, 1);
+    return $sum / 2;
 }
