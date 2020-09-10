@@ -2,7 +2,7 @@
 
 define("COUNT_SLOY", 2);
 define("COUNT_ON_SLOY", 2);
-define("COUNT_OUTPUTS", 1);
+define("COUNT_OUTPUTS", 2);
 
 define("TEACH_KOEF", 0.1);
 
@@ -26,12 +26,27 @@ $weights = array(
     "w222" => 0.32,
     "w113" => -0.41,
     "w213" => 0.12,
+    "w123" => 0.41,
+    "w223" => -0.12,
 );
 //$weights = array();
 ksort($weights);
-pre($weights);
+//pre($weights);
 
-pre(startEpoch($weights, array(1, 0), array(1)));
+pre(startEpoch($weights, array(1, 0), array(1, 1)));
+//pre(startEpoch($weights, array(0, 0, 0), array(1, 0)));
+//pre(startEpoch($weights, array(0, 0, 1), array(1, 0)));
+//pre(startEpoch($weights, array(0, 1, 0), array(1, 0)));
+//pre(startEpoch($weights, array(0, 1, 1), array(0, 1)));
+//pre(startEpoch($weights, array(1, 0, 0), array(1, 0)));
+//pre(startEpoch($weights, array(1, 0, 1), array(0, 1)));
+//pre(startEpoch($weights, array(1, 1, 0), array(0, 1)));
+//pre(startEpoch($weights, array(1, 1, 1), array(0, 1)));
+
+//$isTeach = false;
+//pre(startEpoch($weights, array(1, 1, 1)));
+
+
 
 
 function startEpoch(&$weights, $x, $e = 0)
@@ -50,17 +65,26 @@ function startEpoch(&$weights, $x, $e = 0)
 
         if ($isTeach) {
             $fs["f" . (COUNT_SLOY + 1) . $k] = $p;
+//            pre($e[$k - 1]);
+//            pre($p);
             $ds["d" . (COUNT_SLOY + 1) . ($k)] = $e[$k - 1] - $p;
+//            pre($ds["d" . (COUNT_SLOY + 1) . ($k)]);
         }
     }
+
 
     if ($isTeach) {
         calcErrors($ds, $weights);
 
         $newWeights = weightCorrection($weights, $x, $fs, $ds);
         ksort($newWeights);
-        pre($newWeights);
+//        pre($weights);
         $weights = $newWeights;
+        unset($newWeights);
+//        pre($weights);
+
+//        pre($y, 1);
+        return $y;
     } else
         return $y;
 }
@@ -128,9 +152,13 @@ function calcErrors(&$ds, $weights)
 {
     for ($i = 1; $i <= COUNT_ON_SLOY; $i++) {
         for ($j = 1; $j <= COUNT_OUTPUTS; $j++) {
-            $ds["d" . COUNT_SLOY . $i] = $ds["d" . (COUNT_SLOY + 1) . $j] * $weights["w" . $i . "1" . (COUNT_SLOY + 1)];
+//            pre($weights["w" . $i . $j . (COUNT_SLOY + 1)]);
+            $ds["d" . COUNT_SLOY . $i] = $ds["d" . (COUNT_SLOY + 1) . $j] * $weights["w" . $i . $j . (COUNT_SLOY + 1)];
+//            pre($ds["d" . COUNT_SLOY . $i]);
         }
     }
+
+//    die();
 
     for ($i = COUNT_SLOY - 1; $i > 0; $i--) {
         for ($j = 1; $j <= COUNT_ON_SLOY; $j++) {
@@ -169,11 +197,12 @@ function weightCorrection($weights, $x, &$fs, $ds)
 
     for ($j = 1; $j <= COUNT_OUTPUTS; $j++) {
         $fPr = calcProizvod($fs["f" . (COUNT_SLOY + 1) . $j]);
-
+        pre($fPr);
         $multDsFPrA = $ds["d" . (COUNT_SLOY + 1) . $j] * $fPr * TEACH_KOEF;
 
         for ($i = 1; $i <= COUNT_ON_SLOY; $i++) {
             $w = $weights["w" . $i . $j . (COUNT_SLOY + 1)];
+            pre($w);
             $newWeights["w" . $i . $j . (COUNT_SLOY + 1)] = $w + $multDsFPrA * $fs["f" . COUNT_SLOY . $i];
         }
     }
