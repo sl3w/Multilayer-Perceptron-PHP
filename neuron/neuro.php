@@ -304,10 +304,7 @@ function firstForward(&$weights, $x)
         $jMax = $i == COUNT_SLOY + 1 ? COUNT_OUTPUTS : COUNT_ON_SLOY;
         for ($j = 1; $j <= $jMax; $j++) {
 
-            if ($i == 1)
-                $kMax = count($x);
-            else
-                $kMax = COUNT_ON_SLOY;
+            $kMax = $i == 1 ? count($x) : COUNT_ON_SLOY;
 
             $S = 0;
             for ($k = 1; $k <= $kMax; $k++) {
@@ -405,11 +402,7 @@ function weightCorrection($weights, $x, $ds)
 
             $multDsA = $ds["d" . $i . $j] * TEACH_KOEF2 * (-1);
 
-            if ($i == 1)
-                $kMax = count($x);
-            else
-                $kMax = COUNT_ON_SLOY;
-
+            $kMax = $i == 1 ? count($x) : COUNT_ON_SLOY;
 
             for ($k = 1; $k <= $kMax; $k++) {
 
