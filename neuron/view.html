@@ -49,9 +49,13 @@
 
 <script>
     var currentWeightsValues;
+    // var currentFuncActValues;
+    // var currentAnswersValues;
     var counterIteration = 0;
 
     $("#init").click(function () {
+        $("#teach").attr("disabled", true);
+        $("#test").attr("disabled", true);
         counterIteration = 1;
         $.ajax({
             url: "neuro.php",
@@ -65,12 +69,17 @@
                 let er = result['error'];
                 console.log("Ошибка сети: " + er);
 
+                // currentFuncActValues = result['funcAct'];
+                // currentAnswersValues = result['answers'];
+                // console.log(currentFuncActValues);
+                // console.log(currentAnswersValues);
+
                 let weights = result['weights'];
                 currentWeightsValues = weights;
 
                 // $("#weightsHidden").attr("value", weights);
 
-                let weightsStr = arrayToStr(result['weights']);
+                let weightsStr = arrayToStr(weights);
                 $("#weights").text("Текущее значение весов: \n\n" + weightsStr);
 
                 $("#errorsTable tr:first").after("<tr><td>" + counterIteration + "</td>" + "<td>" + er + "</td></tr>");
