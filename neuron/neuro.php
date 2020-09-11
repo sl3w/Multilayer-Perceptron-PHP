@@ -8,7 +8,7 @@ define("TEACH_KOEF", 0.3);
 define("TEACH_KOEF2", 0.65);
 
 global $isTeach;
-$isTeach = true;
+$isTeach = false;
 
 global $answers, $ethalons;
 $answers = array();
@@ -52,36 +52,66 @@ $weights = array(
 );
 
 //$weights = array();
-ksort($weights);
+//ksort($weights);
 //pre($weights);
 
-//for ($i = 0; $i < 10; $i++) {
-//    pre(startEpoch($weights, array(1, 0), array(1)));
-    pre(startEpoch($weights, array(2, 1, 3), array(1)));
-    pre(startEpoch($weights, array(1, 2, 1), array(0.5)));
-    pre(startEpoch($weights, array(3, 2, 1), array(1)));
-    pre(startEpoch($weights, array(1, 3, 2), array(0.5)));
-//}
+if($_POST['do'] == 'init') {
+    startEpoch($weights, array(2, 1, 3), array(1));
+    startEpoch($weights, array(1, 2, 1), array(0.5));
+    startEpoch($weights, array(3, 2, 1), array(1));
+    startEpoch($weights, array(1, 3, 2), array(0.5));
 
 
+//    pre($answers);
+//    pre($ethalons);
 
-pre($weights);
+    $er = calcError($answers, $ethalons);
+
+//    pre($er);
 
 
-//pre($answers);
+    $res['error'] = $er;
+    $res['weights'] = $weights;
+    echo json_encode($res);
+}
+else {
+    $isTeach = true;
 
-//$er = calcError($answers, $ethalons);
 
-//pre($er);
+//pre($weights);
 
+    startEpoch($weights, array(2, 1, 3), array(1));
+    startEpoch($weights, array(1, 2, 1), array(0.5));
+    startEpoch($weights, array(3, 2, 1), array(1));
+    startEpoch($weights, array(1, 3, 2), array(0.5));
+
+//pre($weights, 1);
+
+    $isTeach = false;
+
+    $answers = array();
+    $ethalons = array();
+
+
+    startEpoch($weights, array(2, 1, 3), array(1));
+    startEpoch($weights, array(1, 2, 1), array(0.5));
+    startEpoch($weights, array(3, 2, 1), array(1));
+    startEpoch($weights, array(1, 3, 2), array(0.5));
+
+
+    pre($answers);
+    pre($ethalons);
+
+    $er = calcError($answers, $ethalons);
+
+    pre($er);
 
 
 //$isTeach = false;
 //pre(startEpoch($weights, array(0, 0, 1)));
 
 
-
-
+}
 
 
 function startEpoch(&$weights, $x, $eth = 0)
@@ -90,18 +120,15 @@ function startEpoch(&$weights, $x, $eth = 0)
 //    $bigSs = array();
     $fs = array();
     generateX($x, $fs);
-    $sOut = firstForward($weights, $x, $fs/*, $bigSs*/);
+    $yOut = firstForward($weights, $x, $fs/*, $bigSs*/);
 
     global $answers, $ethalons;
 //    $answers[] = number_format($sOut, 9);
-    $answers[] = $sOut;
+    $answers[] = $yOut;
     $ethalons[] = $eth;
 
-    pre($answers);
-    pre($ethalons);
-
     if(!$isTeach) {
-        return $sOut;
+        return $yOut;
     }
 
 //    pre($sOut, 1);
@@ -109,7 +136,7 @@ function startEpoch(&$weights, $x, $eth = 0)
 //    ksort($weights);
 //    pre($weights);
 
-    foreach ($sOut as $k => $value) {
+    foreach ($yOut as $k => $value) {
         $proiz = calcProizvod($value);
 
 //        pre($value);
@@ -352,14 +379,6 @@ function weightCorrection($weights, $x, &$fs, $ds)
     return $newWeights;
 }
 
-function pre($var, $die = false)
-{
-    echo '<pre>';
-    print_r($var);
-    echo '</pre>';
-    if ($die)
-        die('Debug in PRE');
-}
 
 function randWeight()
 {
@@ -378,11 +397,24 @@ function calcProizvod($x)
 
 function calcError($answers, $ethalons) {
     $sum = 0;
-    foreach ($answers as $k => $answer) {
-//        pre($answers[$k]);
-//        pre($ethalons[$k]);
-        $sum += pow($answer - $ethalons[$k], 2);
+    foreach ($answers as $k => $answerVector) {
+        //pre($answerVector);
+        //pre($ethalons[$k]);
+        $ethalonVector = $ethalons[$k];
+        foreach ($answerVector as $l => $answer) {
+            $sum += pow($answer - $ethalonVector[$l], 2);
+        }
     }
 //    pre($sum, 1);
     return $sum / 2;
+}
+
+
+function pre($var, $die = false)
+{
+    echo '<pre>';
+    print_r($var);
+    echo '</pre>';
+    if ($die)
+        die('Debug in PRE');
 }

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+
+<body>
+
+<button id="init">
+    Инициализация
+</button>
+
+
+<pre id="weights">
+
+</pre>
+
+</body>
+
+<script>
+    $("#init").click(function () {
+        $.ajax({
+            url: "neuro.php",
+            type: 'POST',
+            dataType: 'json',
+            data: {do: 'init'},
+            success: function (result) {
+                console.log("Ошибка сети: " + result['error']);
+                let weights = result['weights'];
+                let weightsStr = arrayToStr(result['weights']);
+                $("#weights").text("Значение весов: \n\n" + weightsStr);
+            }
+        });
+    });
+
+    function arrayToStr(arr) {
+        let blkstr = [];
+        $.each(arr, function(index, value) {
+            blkstr.push(index + ": " + value);
+        });
+        return blkstr.join("\n");
+    }
+</script>
+</html>
