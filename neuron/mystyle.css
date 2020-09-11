@@ -1,0 +1,21 @@
+body {
+    display: flex;
+}
+
+div {
+    display: flex;
+    margin-right: 30px;
+}
+
+.buttons {
+    flex-direction: column;
+}
+
+.buttons button {
+    margin-bottom: 30px;
+}
+
+.errors {
+    max-height: 350px;
+    overflow-y: scroll;
+}

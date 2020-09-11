@@ -37,25 +37,27 @@ $dopWeight = array();
 
 
 $weights = array(
-  "w111" => 0.5,
-  "w112" => -0.1,
-  "w113" => 0.2,
-  "w121" => 0.3,
-  "w122" => -0.23,
-  "w123" => 0.43,
-  "w211" => 0.33,
-  "w212" => -0.4,
-  "w221" => -0.5,
-  "w222" => 0.2,
-  "w311" => -0.49,
-  "w312" => 0.39,
+    "w111" => 0.5,
+    "w112" => -0.1,
+    "w113" => 0.2,
+    "w121" => 0.3,
+    "w122" => -0.23,
+    "w123" => 0.43,
+    "w211" => 0.33,
+    "w212" => -0.4,
+    "w221" => -0.5,
+    "w222" => 0.2,
+    "w311" => -0.49,
+    "w312" => 0.39,
 );
 
 //$weights = array();
 //ksort($weights);
 //pre($weights);
 
-if($_POST['do'] == 'init') {
+if ($_POST['do'] == 'init') {
+    $isTeach = false;
+
     startEpoch($weights, array(2, 1, 3), array(1));
     startEpoch($weights, array(1, 2, 1), array(0.5));
     startEpoch($weights, array(3, 2, 1), array(1));
@@ -73,18 +75,24 @@ if($_POST['do'] == 'init') {
     $res['error'] = $er;
     $res['weights'] = $weights;
     echo json_encode($res);
-}
-else {
+} elseif ($_POST['do'] == 'teach') {
     $isTeach = true;
 
+    $weights = $_POST['weights'];
+    $countProhodov = $_POST['countProhodov'];
+
+
+//    echo json_encode($weights);
+//    return;
 
 //pre($weights);
 
-    startEpoch($weights, array(2, 1, 3), array(1));
-    startEpoch($weights, array(1, 2, 1), array(0.5));
-    startEpoch($weights, array(3, 2, 1), array(1));
-    startEpoch($weights, array(1, 3, 2), array(0.5));
-
+    for ($i = 0; $i < $countProhodov; $i++) {
+        startEpoch($weights, array(2, 1, 3), array(1));
+        startEpoch($weights, array(1, 2, 1), array(0.5));
+        startEpoch($weights, array(3, 2, 1), array(1));
+        startEpoch($weights, array(1, 3, 2), array(0.5));
+    }
 //pre($weights, 1);
 
     $isTeach = false;
@@ -99,12 +107,14 @@ else {
     startEpoch($weights, array(1, 3, 2), array(0.5));
 
 
-    pre($answers);
-    pre($ethalons);
+//    pre($answers);
+//    pre($ethalons);
 
     $er = calcError($answers, $ethalons);
 
-    pre($er);
+    $res['error'] = $er;
+    $res['weights'] = $weights;
+    echo json_encode($res);
 
 
 //$isTeach = false;
@@ -127,7 +137,7 @@ function startEpoch(&$weights, $x, $eth = 0)
     $answers[] = $yOut;
     $ethalons[] = $eth;
 
-    if(!$isTeach) {
+    if (!$isTeach) {
         return $yOut;
     }
 
@@ -150,11 +160,11 @@ function startEpoch(&$weights, $x, $eth = 0)
 //            pre($eth[$k - 1]);
 //            pre($p);
 
-            $d = $value - $eth[$k];
+        $d = $value - $eth[$k];
 
 //            pre($d, 1);
 
-            $ds["d" . (COUNT_SLOY + 1) . ($k + 1)] = $d * $proiz;
+        $ds["d" . (COUNT_SLOY + 1) . ($k + 1)] = $d * $proiz;
 //            pre($ds["d" . (COUNT_SLOY + 1) . ($k)]);
 //        }
     }
@@ -202,7 +212,7 @@ function firstForward(&$weights, $x, &$fs, &$bigSs = array())
 
             $S = 0;
             for ($k = 1; $k <= $kMax; $k++) {
-                $weightKey = "w". $i . $j  . $k;
+                $weightKey = "w" . $i . $j . $k;
 
                 if (!key_exists($weightKey, $weights)) {
                     $weights[$weightKey] = randWeight();
@@ -250,7 +260,7 @@ function firstForward(&$weights, $x, &$fs, &$bigSs = array())
 
         $funAct = calcFa($S);
 
-        $fs["f". (COUNT_SLOY + 1). $j] = $funAct;
+        $fs["f" . (COUNT_SLOY + 1) . $j] = $funAct;
 //        $y[$j] = $funAct;
         $y[] = $funAct;
     }
@@ -258,13 +268,14 @@ function firstForward(&$weights, $x, &$fs, &$bigSs = array())
     return $y;
 }
 
-function getRandDopWeight($k) {
+function getRandDopWeight($k)
+{
     global $dopWeight;
     if (!key_exists($k, $dopWeight)) {
-        $dopWeight["d". $k] = randWeight();
+        $dopWeight["d" . $k] = randWeight();
     }
     pre($dopWeight);
-    return $dopWeight["d". $k];
+    return $dopWeight["d" . $k];
 }
 
 function calcErrors(&$ds, $weights, $fs)
@@ -276,15 +287,15 @@ function calcErrors(&$ds, $weights, $fs)
 //        pre("f" . (COUNT_SLOY) . $i . ":" . $fs["f" . (COUNT_SLOY) . $i]);
         for ($j = 1; $j <= COUNT_OUTPUTS; $j++) {
 //            for ($k = 1; $k <= COUNT_OUTPUTS; $k++) {
-                $d = $ds["d" . (COUNT_SLOY + 1) . $j];
-                $w = $weights["w" . (COUNT_SLOY + 1) . $j . $i];
+            $d = $ds["d" . (COUNT_SLOY + 1) . $j];
+            $w = $weights["w" . (COUNT_SLOY + 1) . $j . $i];
 
 //                pre("d" . (COUNT_SLOY + 1) . $j . ":" . $d);
 //                pre("w" . (COUNT_SLOY + 1) . $j . $i . ":" . $w);
 //                pre("f" . (COUNT_SLOY) . $i . ":" . $fs["f" . (COUNT_SLOY) . $i]);
 //                pre("________________");
 
-                $curD += $d * $w * $fPr;
+            $curD += $d * $w * $fPr;
 //            }
             $ds["d" . COUNT_SLOY . $i] = $curD;
         }
@@ -294,7 +305,6 @@ function calcErrors(&$ds, $weights, $fs)
     for ($i = COUNT_SLOY - 1; $i > 0; $i--) {
         for ($j = 1; $j <= COUNT_ON_SLOY; $j++) {
             $curD = 0;
-
 
 
 //            $w = $weights["w" . $k . $i . $j];
@@ -317,7 +327,7 @@ function calcErrors(&$ds, $weights, $fs)
 
 //            pre("f". $i. $j . ":" . $fs["f". $i. $j]);
 //            pre($curD);
-            $curD *= calcProizvod($fs["f". $i. $j]);
+            $curD *= calcProizvod($fs["f" . $i . $j]);
 //            die();
             $ds["d" . $i . $j] = $curD;
         }
@@ -370,9 +380,9 @@ function weightCorrection($weights, $x, &$fs, $ds)
         for ($i = 1; $i <= COUNT_ON_SLOY; $i++) {
 //            pre($fs["f" . COUNT_SLOY . $i]);
             $newW = $fs["f" . COUNT_SLOY . $i] * $multDsA;
-            $w = $weights["w"  . (COUNT_SLOY + 1) . $j . $i];
+            $w = $weights["w" . (COUNT_SLOY + 1) . $j . $i];
 //            pre($w);
-            $newWeights["w"  . (COUNT_SLOY + 1) . $j . $i] = $w + $newW;
+            $newWeights["w" . (COUNT_SLOY + 1) . $j . $i] = $w + $newW;
         }
     }
 //    pre($newWeights);
@@ -395,7 +405,8 @@ function calcProizvod($x)
     return $x * (1 - $x);
 }
 
-function calcError($answers, $ethalons) {
+function calcError($answers, $ethalons)
+{
     $sum = 0;
     foreach ($answers as $k => $answerVector) {
         //pre($answerVector);

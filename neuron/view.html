@@ -1,47 +1,113 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+
+    <link rel="stylesheet" href="/neuron/mystyle.css">
 </head>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 
 <body>
+<div class="buttons">
+    <button id="init">
+        Инициализация
+    </button>
+    <button id="teach" disabled>
+        Обучение
+    </button>
+    <label>Количество проходов:</label>
+    <input id="countProhodov" type="number" min="100" step="100" value="1000">
+</div>
 
-<button id="init">
-    Инициализация
-</button>
-
-
-<pre id="weights">
-
+<div class="weights">
+<pre id="weights">Текущее значение весов:
 </pre>
+    <input id="weightsHidden" type="hidden">
+</div>
 
+<div class="errors">
+    <table id="errorsTable">
+        <th>
+            Ошибки сети
+        </th>
+    </table>
+</div>
 </body>
 
 <script>
+    var currentWeightsValues;
+    var counterIteration = 0;
+
     $("#init").click(function () {
+        counterIteration = 1;
         $.ajax({
             url: "neuro.php",
             type: 'POST',
             dataType: 'json',
             data: {do: 'init'},
             success: function (result) {
-                console.log("Ошибка сети: " + result['error']);
+                $("#errorsTable td").remove();
+                $("#errorsTable tr:not(:first-child)").remove();
+
+                let er = result['error'];
+                console.log("Ошибка сети: " + er);
+
                 let weights = result['weights'];
+                currentWeightsValues = weights;
+
+                // $("#weightsHidden").attr("value", weights);
+
                 let weightsStr = arrayToStr(result['weights']);
-                $("#weights").text("Значение весов: \n\n" + weightsStr);
+                $("#weights").text("Текущее значение весов: \n\n" + weightsStr);
+
+                $("#errorsTable tr:last").after("<tr><td>" + counterIteration + "</td>" + "<td>" + er + "</td></tr>");
+                $("#teach").attr("disabled", false);
             }
         });
     });
 
     function arrayToStr(arr) {
         let blkstr = [];
-        $.each(arr, function(index, value) {
+        $.each(arr, function (index, value) {
             blkstr.push(index + ": " + value);
         });
         return blkstr.join("\n");
     }
+
+    $("#teach").click(function () {
+        $(this).attr("disabled", true);
+        counterIteration++;
+        console.log(counterIteration);
+
+        let countProhodov = $("#countProhodov").val();
+
+        console.log(countProhodov);
+
+        $.ajax({
+            url: "neuro.php",
+            type: 'POST',
+            dataType: 'json',
+            data: {do: 'teach', weights: currentWeightsValues, countProhodov: countProhodov},
+            success: function (result) {
+                console.log(result);
+                let er = result['error'];
+                console.log("Ошибка сети: " + er);
+
+                let weights = result['weights'];
+                currentWeightsValues = weights;
+
+                // $("#weightsHidden").attr("value", weights);
+
+                let weightsStr = arrayToStr(result['weights']);
+                $("#weights").text("Текущее значение весов: \n\n" + weightsStr);
+
+                $("#errorsTable tr:last").after("<tr><td>" + counterIteration + "</td>" + "<td>" + er + "</td></tr>");
+                $("#teach").attr("disabled", false);
+            }
+        });
+
+    });
 </script>
 </html>
