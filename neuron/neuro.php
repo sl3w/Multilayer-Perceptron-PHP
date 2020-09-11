@@ -58,10 +58,39 @@ $weights = array(
 if ($_POST['do'] == 'init') {
     $isTeach = false;
 
-    startEpoch($weights, array(2, 1, 3), array(1));
-    startEpoch($weights, array(1, 2, 1), array(0.5));
-    startEpoch($weights, array(3, 2, 1), array(1));
-    startEpoch($weights, array(1, 3, 2), array(0.5));
+//    startEpoch($weights, array(2, 1, 3), array(1));
+//    startEpoch($weights, array(1, 2, 1), array(0.5));
+//    startEpoch($weights, array(3, 2, 1), array(1));
+//    startEpoch($weights, array(1, 3, 2), array(0.5));
+
+//    startEpoch($weights, array(1, 2, 3), array(0));
+//    startEpoch($weights, array(1, 3, 2), array(0));
+//    startEpoch($weights, array(2, 1, 3), array(0.5));
+//    startEpoch($weights, array(2, 3, 1), array(0.5));
+//    startEpoch($weights, array(3, 2, 1), array(1));
+//    startEpoch($weights, array(3, 1, 2), array(1));
+
+
+    startEpoch($weights, array(0, 0, 0), array(0));
+    startEpoch($weights, array(2, 0, 0), array(0));
+    startEpoch($weights, array(3, 0, 0), array(0));
+    startEpoch($weights, array(0, 0, 1), array(0));
+    startEpoch($weights, array(0, 0, 2), array(0));
+    startEpoch($weights, array(0, 0, 3), array(0));
+    startEpoch($weights, array(0, 1, 0), array(0));
+    startEpoch($weights, array(0, 1, 1), array(1));
+    startEpoch($weights, array(2, 1, 1), array(1));
+    startEpoch($weights, array(3, 1, 1), array(1));
+    startEpoch($weights, array(1, 0, 0), array(0));
+    startEpoch($weights, array(2, 0, 0), array(0));
+    startEpoch($weights, array(3, 0, 0), array(0));
+    startEpoch($weights, array(1, 0, 1), array(1));
+    startEpoch($weights, array(1, 2, 1), array(1));
+    startEpoch($weights, array(1, 3, 1), array(1));
+    startEpoch($weights, array(1, 1, 0), array(1));
+    startEpoch($weights, array(1, 1, 2), array(1));
+    startEpoch($weights, array(1, 1, 3), array(1));
+    startEpoch($weights, array(1, 1, 1), array(1));
 
 
 //    pre($answers);
@@ -88,10 +117,39 @@ if ($_POST['do'] == 'init') {
 //pre($weights);
 
     for ($i = 0; $i < $countProhodov; $i++) {
-        startEpoch($weights, array(2, 1, 3), array(1));
-        startEpoch($weights, array(1, 2, 1), array(0.5));
-        startEpoch($weights, array(3, 2, 1), array(1));
-        startEpoch($weights, array(1, 3, 2), array(0.5));
+//        startEpoch($weights, array(2, 1, 3), array(1));
+//        startEpoch($weights, array(1, 2, 1), array(0.5));
+//        startEpoch($weights, array(3, 2, 1), array(1));
+//        startEpoch($weights, array(1, 3, 2), array(0.5));
+
+//        startEpoch($weights, array(1, 2, 3), array(0));
+//        startEpoch($weights, array(1, 3, 2), array(0));
+//        startEpoch($weights, array(2, 1, 3), array(0.5));
+//        startEpoch($weights, array(2, 3, 1), array(0.5));
+//        startEpoch($weights, array(3, 2, 1), array(1));
+//        startEpoch($weights, array(3, 1, 2), array(1));
+
+
+        startEpoch($weights, array(0, 0, 0), array(0));
+        startEpoch($weights, array(2, 0, 0), array(0));
+        startEpoch($weights, array(3, 0, 0), array(0));
+        startEpoch($weights, array(0, 0, 1), array(0));
+        startEpoch($weights, array(0, 0, 2), array(0));
+        startEpoch($weights, array(0, 0, 3), array(0));
+        startEpoch($weights, array(0, 1, 0), array(0));
+        startEpoch($weights, array(0, 1, 1), array(1));
+        startEpoch($weights, array(2, 1, 1), array(1));
+        startEpoch($weights, array(3, 1, 1), array(1));
+        startEpoch($weights, array(1, 0, 0), array(0));
+        startEpoch($weights, array(2, 0, 0), array(0));
+        startEpoch($weights, array(3, 0, 0), array(0));
+        startEpoch($weights, array(1, 0, 1), array(1));
+        startEpoch($weights, array(1, 2, 1), array(1));
+        startEpoch($weights, array(1, 3, 1), array(1));
+        startEpoch($weights, array(1, 1, 0), array(1));
+        startEpoch($weights, array(1, 1, 2), array(1));
+        startEpoch($weights, array(1, 1, 3), array(1));
+        startEpoch($weights, array(1, 1, 1), array(1));
     }
 //pre($weights, 1);
 
@@ -101,10 +159,38 @@ if ($_POST['do'] == 'init') {
     $ethalons = array();
 
 
-    startEpoch($weights, array(2, 1, 3), array(1));
-    startEpoch($weights, array(1, 2, 1), array(0.5));
-    startEpoch($weights, array(3, 2, 1), array(1));
-    startEpoch($weights, array(1, 3, 2), array(0.5));
+//    startEpoch($weights, array(2, 1, 3), array(1));
+//    startEpoch($weights, array(1, 2, 1), array(0.5));
+//    startEpoch($weights, array(3, 2, 1), array(1));
+//    startEpoch($weights, array(1, 3, 2), array(0.5));
+
+//    startEpoch($weights, array(1, 2, 3), array(0));
+//    startEpoch($weights, array(1, 3, 2), array(0));
+//    startEpoch($weights, array(2, 1, 3), array(0.5));
+//    startEpoch($weights, array(2, 3, 1), array(0.5));
+//    startEpoch($weights, array(3, 2, 1), array(1));
+//    startEpoch($weights, array(3, 1, 2), array(1));
+
+    startEpoch($weights, array(0, 0, 0), array(0));
+    startEpoch($weights, array(2, 0, 0), array(0));
+    startEpoch($weights, array(3, 0, 0), array(0));
+    startEpoch($weights, array(0, 0, 1), array(0));
+    startEpoch($weights, array(0, 0, 2), array(0));
+    startEpoch($weights, array(0, 0, 3), array(0));
+    startEpoch($weights, array(0, 1, 0), array(0));
+    startEpoch($weights, array(0, 1, 1), array(1));
+    startEpoch($weights, array(2, 1, 1), array(1));
+    startEpoch($weights, array(3, 1, 1), array(1));
+    startEpoch($weights, array(1, 0, 0), array(0));
+    startEpoch($weights, array(2, 0, 0), array(0));
+    startEpoch($weights, array(3, 0, 0), array(0));
+    startEpoch($weights, array(1, 0, 1), array(1));
+    startEpoch($weights, array(1, 2, 1), array(1));
+    startEpoch($weights, array(1, 3, 1), array(1));
+    startEpoch($weights, array(1, 1, 0), array(1));
+    startEpoch($weights, array(1, 1, 2), array(1));
+    startEpoch($weights, array(1, 1, 3), array(1));
+    startEpoch($weights, array(1, 1, 1), array(1));
 
 
 //    pre($answers);
@@ -121,10 +207,22 @@ if ($_POST['do'] == 'init') {
 //pre(startEpoch($weights, array(0, 0, 1)));
 
 
+} elseif ($_POST['do'] == 'test') {
+    $weights = $_POST['weights'];
+
+    $in1 = $_POST['in1'];
+    $in2 = $_POST['in2'];
+    $in3 = $_POST['in3'];
+
+    $ans = startEpoch($weights, array($in1, $in2, $in3));
+
+    $res['answer'] = $ans;
+//    $res['weights'] = $weights;
+    echo json_encode($res);
 }
 
 
-function startEpoch(&$weights, $x, $eth = 0)
+function startEpoch(&$weights, $x, $eth = false)
 {
     global $isTeach;
 //    $bigSs = array();
@@ -137,7 +235,7 @@ function startEpoch(&$weights, $x, $eth = 0)
     $answers[] = $yOut;
     $ethalons[] = $eth;
 
-    if (!$isTeach) {
+    if (!$isTeach || !$eth) {
         return $yOut;
     }
 

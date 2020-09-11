@@ -19,6 +19,15 @@
     </button>
     <label>Количество проходов:</label>
     <input id="countProhodov" type="number" min="100" step="100" value="1000">
+
+    <br>
+    <input id="in1" type="number" min="0" step="100" value="1000">
+    <input id="in2" type="number" min="0" step="100" value="1000">
+    <input id="in3" type="number" min="0" step="100" value="1000">
+
+    <button id="test" disabled>
+        Тест
+    </button>
 </div>
 
 <div class="weights">
@@ -29,9 +38,11 @@
 
 <div class="errors">
     <table id="errorsTable">
-        <th>
-            Ошибки сети
-        </th>
+        <tr>
+            <th>
+                Ошибки сети
+            </th>
+        </tr>
     </table>
 </div>
 </body>
@@ -62,7 +73,7 @@
                 let weightsStr = arrayToStr(result['weights']);
                 $("#weights").text("Текущее значение весов: \n\n" + weightsStr);
 
-                $("#errorsTable tr:last").after("<tr><td>" + counterIteration + "</td>" + "<td>" + er + "</td></tr>");
+                $("#errorsTable tr:first").after("<tr><td>" + counterIteration + "</td>" + "<td>" + er + "</td></tr>");
                 $("#teach").attr("disabled", false);
             }
         });
@@ -77,7 +88,8 @@
     }
 
     $("#teach").click(function () {
-        $(this).attr("disabled", true);
+        $("#teach").attr("disabled", true);
+        $("#test").attr("disabled", true);
         counterIteration++;
         console.log(counterIteration);
 
@@ -103,11 +115,52 @@
                 let weightsStr = arrayToStr(result['weights']);
                 $("#weights").text("Текущее значение весов: \n\n" + weightsStr);
 
-                $("#errorsTable tr:last").after("<tr><td>" + counterIteration + "</td>" + "<td>" + er + "</td></tr>");
+                $("#errorsTable tr:first").after("<tr><td>" + counterIteration + "</td>" + "<td>" + er + "</td></tr>");
+
+
                 $("#teach").attr("disabled", false);
+                $("#test").attr("disabled", false);
             }
         });
+    });
 
+    $("#test").click(function () {
+        $("#teach").attr("disabled", true);
+        $("#test").attr("disabled", true);
+        // counterIteration++;
+        // console.log(counterIteration);
+
+        let in1 = $("#in1").val();
+        let in2 = $("#in2").val();
+        let in3 = $("#in3").val();
+
+        // console.log(countProhodov);
+
+        $.ajax({
+            url: "neuro.php",
+            type: 'POST',
+            dataType: 'json',
+            data: {do: 'test', weights: currentWeightsValues, in1: in1, in2: in2, in3: in3},
+            success: function (result) {
+                console.log(result['answer']);
+                // console.log(result);
+                // let er = result['error'];
+                // console.log("Ошибка сети: " + er);
+                //
+                // let weights = result['weights'];
+                // currentWeightsValues = weights;
+                //
+                // $("#weightsHidden").attr("value", weights);
+
+                // let weightsStr = arrayToStr(result['weights']);
+                // $("#weights").text("Текущее значение весов: \n\n" + weightsStr);
+                //
+                // $("#errorsTable tr:first").after("<tr><td>" + counterIteration + "</td>" + "<td>" + er + "</td></tr>");
+                //
+                $("#teach").attr("disabled", false);
+                $("#test").attr("disabled", false);
+            }
+        });
     });
 </script>
 </html>
