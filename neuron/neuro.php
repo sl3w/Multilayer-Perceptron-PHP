@@ -317,15 +317,12 @@ function firstForward(&$weights, $x)
 //                $S += 1 * getRandDopWeight($weightKey);
             }
 
-//            $bigSs["s" . $i . $j] = $S;
-
             setValueFuncAct($i, $j, calcFa($S));
 
             if ($i == COUNT_SLOY + 1)
                 $y[] = calcFa($S);
         }
     }
-
 
 //    for ($j = 1; $j <= COUNT_OUTPUTS; $j++) {
 //        $S = 0;
@@ -476,24 +473,24 @@ function pre($var, $die = false)
         die('Debug in PRE');
 }
 
-function ulogging($input, $logname = 'debug', $dt = false)
-{
-    $endLine = "\r\n"; #PHP_EOL не используется, т.к. иногда это нужно конфигурировать это
-
-    $fp = fopen('' . $logname . '.txt', "a+");
-
-    if (is_string($input)) {
-        $writeStr = $input;
-    } else {
-        $writeStr = print_r($input, true);
-    }
-
-    if ($dt) {
-        fwrite($fp, date('d.m.Y H:i:s') . $endLine);
-    }
-
-    fwrite($fp, $writeStr . $endLine);
-
-    fclose($fp);
-    return true;
-}
+//function ulogging($input, $logname = 'debug', $dt = false)
+//{
+//    $endLine = "\r\n"; #PHP_EOL не используется, т.к. иногда это нужно конфигурировать это
+//
+//    $fp = fopen('' . $logname . '.txt', "a+");
+//
+//    if (is_string($input)) {
+//        $writeStr = $input;
+//    } else {
+//        $writeStr = print_r($input, true);
+//    }
+//
+//    if ($dt) {
+//        fwrite($fp, date('d.m.Y H:i:s') . $endLine);
+//    }
+//
+//    fwrite($fp, $writeStr . $endLine);
+//
+//    fclose($fp);
+//    return true;
+//}
