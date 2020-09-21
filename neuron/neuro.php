@@ -1,6 +1,6 @@
 <?php
-define("COUNT_ON_SLOY", 2);
-define("COUNT_OUTPUTS", 2);
+define("COUNT_ON_SLOY", 4);
+define("COUNT_OUTPUTS", 3);
 define("FUNC_KOEF", 0.3);
 
 global $isTeach, $answers, $ethalons, $funcsAct, $numPrimer, $teachKoef, $hideLayCount;
@@ -15,6 +15,23 @@ $isTeach = false;
 $do = $_POST['do'];
 $hideLayCount = $_POST['hideLayCount'];
 
+//$weights = array(
+//    "w111" => 0.13,
+//    "w112" => -0.34,
+//    "w113" => -0.42,
+//    "w114" => 0.38,
+//    "w211" => 0.25,
+//    "w221" => 0.07,
+//    "w231" => -0.20,
+////    "w222" => 0.32,
+////    "w113" => -0.41,
+////    "w213" => 0.12,
+////    "w123" => 0.41,
+////    "w223" => -0.12,
+//);
+
+global $do;
+//$do = 'init';
 if ($do == 'init') {
     $numPrimer = 1;
     goEpoch($weights);
@@ -87,6 +104,7 @@ function startExample(&$weights, $x, $eth = false)
 
     if ($isTeach) {
         calcBackPropErrors($ds, $weights);
+
         $newWeights = weightCorrection($weights, $x, $ds);
 
         $weights = $newWeights;
@@ -116,6 +134,9 @@ function firstForward(&$weights, $x)
 
                 if (!key_exists($weightKey, $weights)) {
                     $weights[$weightKey] = getRandWeight();
+                    global $do;
+                    if ($do != 'init')
+                    die();
                 }
                 $S += getValueFuncAct($i - 1, $k) * $weights[$weightKey];
             }
@@ -171,14 +192,13 @@ function weightCorrection($weights, $x, $ds)
         for ($j = 1; $j <= $jMax; $j++) {
 
             $multDsA = $ds["d" . $i . $j] * $teachKoef * (-1);
-
             $kMax = $i == 1 ? count($x) : COUNT_ON_SLOY;
 
             for ($k = 1; $k <= $kMax; $k++) {
-
                 $newW = getValueFuncAct($i - 1, $k) * $multDsA;
 
                 $w = $weights["w" . $i . $j . $k];
+
                 $newWeights["w" . $i . $j . $k] = $w + $newW;
             }
         }
@@ -203,6 +223,18 @@ function calcProizvod($x)
     return $x * (1 - $x);
 }
 
+$x1 = array(
+  array(0.49703,0.499170,0.502369)
+);
+
+$x2 = array(
+    array(1,0,0)
+);
+
+//pre($x1);
+//pre($x2);
+//
+//pre(calcNetworkError($x1, $x2));
 function calcNetworkError($answers, $ethalons)
 {
     $sum = 0;
@@ -229,26 +261,60 @@ function setValueFuncAct($i, $j, $value)
 
 function goEpoch(&$weights)
 {
-    startExample($weights, array(0, 0, 0), array(1, 0));
-    startExample($weights, array(2, 0, 0), array(1, 0));
-    startExample($weights, array(3, 0, 0), array(1, 0));
-    startExample($weights, array(0, 0, 1), array(1, 0));
-    startExample($weights, array(0, 0, 2), array(1, 0));
-    startExample($weights, array(0, 0, 3), array(1, 0));
-    startExample($weights, array(0, 1, 0), array(1, 0));
-    startExample($weights, array(0, 1, 1), array(0, 1));
-    startExample($weights, array(2, 1, 1), array(0, 1));
-    startExample($weights, array(3, 1, 1), array(0, 1));
-    startExample($weights, array(1, 0, 0), array(1, 0));
-    startExample($weights, array(2, 0, 0), array(1, 0));
-    startExample($weights, array(3, 0, 0), array(1, 0));
-    startExample($weights, array(1, 0, 1), array(0, 1));
-    startExample($weights, array(1, 2, 1), array(0, 1));
-    startExample($weights, array(1, 3, 1), array(0, 1));
-    startExample($weights, array(1, 1, 0), array(0, 1));
-    startExample($weights, array(1, 1, 2), array(0, 1));
-    startExample($weights, array(1, 1, 3), array(0, 1));
-    startExample($weights, array(1, 1, 1), array(0, 1));
+    $handle = fopen("iris.data", "r");
+    while (!feof($handle)) {
+        $buffer = fgets($handle, 4096);
+        $exam = explode(",", trim($buffer));
+//    pre($exam);
+//    $eth = array(0,0,0,0,0,0,0,0);
+        $et = $exam[count($exam) - 1];
+//        if($et == 0 || $et == 1)
+//            continue;
+//        $eth[$et - 2] = 1;
+        switch ($et) {
+            case "Iris-setosa":
+                $eth = array(1,0,0);
+                break;
+            case "Iris-versicolor":
+                $eth = array(0,1,0);
+                break;
+            case "Iris-virginica":
+                $eth = array(0,0,1);
+                break;
+        }
+
+        $xs = array_splice($exam, 0, count($exam) - 1);
+//        pre($xs);
+//        pre($eth);
+//        die();
+        startExample($weights, $xs, $eth);
+//        break;
+    }
+    fclose($handle);
+
+//    startExample($weights, array(5.1,3.5,1.4,0.2), array(1));
+
+
+//    startExample($weights, array(0, 0, 0), array(1, 0));
+//    startExample($weights, array(2, 0, 0), array(1, 0));
+//    startExample($weights, array(3, 0, 0), array(1, 0));
+//    startExample($weights, array(0, 0, 1), array(1, 0));
+//    startExample($weights, array(0, 0, 2), array(1, 0));
+//    startExample($weights, array(0, 0, 3), array(1, 0));
+//    startExample($weights, array(0, 1, 0), array(1, 0));
+//    startExample($weights, array(0, 1, 1), array(0, 1));
+//    startExample($weights, array(2, 1, 1), array(0, 1));
+//    startExample($weights, array(3, 1, 1), array(0, 1));
+//    startExample($weights, array(1, 0, 0), array(1, 0));
+//    startExample($weights, array(2, 0, 0), array(1, 0));
+//    startExample($weights, array(3, 0, 0), array(1, 0));
+//    startExample($weights, array(1, 0, 1), array(0, 1));
+//    startExample($weights, array(1, 2, 1), array(0, 1));
+//    startExample($weights, array(1, 3, 1), array(0, 1));
+//    startExample($weights, array(1, 1, 0), array(0, 1));
+//    startExample($weights, array(1, 1, 2), array(0, 1));
+//    startExample($weights, array(1, 1, 3), array(0, 1));
+//    startExample($weights, array(1, 1, 1), array(0, 1));
 }
 
 function pre($var, $die = false)
@@ -281,3 +347,65 @@ function pre($var, $die = false)
 //    fclose($fp);
 //    return true;
 //}
+
+//    $handle = fopen("iris.data", "r");
+//    while (!feof($handle)) {
+//        $buffer = fgets($handle, 4096);
+//        $exam = explode(",", trim($buffer));
+////    pre($exam);
+////    $eth = array(0,0,0,0,0,0,0,0,0,0);
+//        $et = $exam[count($exam) - 1];
+//        switch ($et) {
+//            case "Iris-setosa":
+//                $eth = array(1,0,0);
+//                break;
+//            case "Iris-versicolor":
+//                $eth = array(0,1,0);
+//                break;
+//            case "Iris-virginica":
+//                $eth = array(0,0,1);
+//                break;
+//        }
+//
+//        $xs = array_splice($exam, 0, count($exam) - 1);
+//        pre($xs);
+//        pre($eth);
+//        die();
+////        startExample($weights, $xs, $eth);
+//    }
+//    fclose($handle);
+
+
+//$hideLayCount = 1;
+//$teachKoef = 0.2;
+//
+//$numPrimer = 1;
+//goEpoch($weights);
+//
+//$er = calcNetworkError($answers, $ethalons);
+//
+//pre($er);
+//pre($weights);
+//
+//$isTeach = true;
+//
+//for($i = 0; $i < 2000; $i++) {
+//    $numPrimer = 1;
+//    goEpoch($weights);
+//}
+//
+//$isTeach = false;
+//
+//$answers=array();
+//$ethalons=array();
+//goEpoch($weights);
+//
+//$er = calcNetworkError($answers, $ethalons);
+//pre($er);
+//pre($weights);
+//
+//$isTeach = true;
+//
+//$numPrimer = 1;
+//goEpoch($weights);
+//pre($weights);

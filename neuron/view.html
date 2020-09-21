@@ -12,7 +12,7 @@
 <body>
 <div class="buttons">
     <label>Кол-во скрытых слоев:</label>
-    <input id="hideLayCount" type="number" min="1" max="10" value="2">
+    <input id="hideLayCount" type="number" min="1" max="5" value="1">
     <button id="init">
         Инициализация
     </button>
@@ -22,9 +22,13 @@
     <label>Коэф. обучения:</label>
     <input id="teachKoef" type="number" min="0" max="1" step="0.01" value="0.1">
 
+    <div style="display: flex">
+        <input id="stopTeach" type="checkbox"><label for="stopTeach">Остановить</label>
+    </div>
     <button id="teach" disabled>
         Обучение
     </button>
+
 
     <label>Тестовые данные:</label>
     <input id="in1" type="number" min="0" step="1" value="1">
@@ -127,12 +131,19 @@
         let countEpochs = $("#countEpochs").val();
         let teachKoef = $("#teachKoef").val();
 
-        console.log(hideLayCount);
+        // console.log(hideLayCount);
+        // console.log(currentWeightsValues);
         $.ajax({
             url: "neuro.php",
             type: 'POST',
             dataType: 'json',
-            data: {do: 'teach', weights: currentWeightsValues, countEpochs: countEpochs, teachKoef: teachKoef, hideLayCount: hideLayCount},
+            data: {
+                do: 'teach',
+                weights: currentWeightsValues,
+                countEpochs: countEpochs,
+                teachKoef: teachKoef,
+                hideLayCount: hideLayCount
+            },
             success: function (result) {
                 console.log(result);
                 let er = result['error'];
@@ -148,6 +159,12 @@
 
                 $("#teach").attr("disabled", false);
                 $("#test").attr("disabled", false);
+
+                if (er > 1 && !($("#stopTeach").is(':checked'))) {
+                    $("#teach").click();
+                } else {
+                    $("#stopTeach").prop('checked', false);
+                }
             }
         });
     });
