@@ -19,3 +19,11 @@ div {
     max-height: 350px;
     overflow-y: scroll;
 }
+
+.errors table {
+    width: 700px;
+}
+
+.errors td {
+    text-align: center;
+}

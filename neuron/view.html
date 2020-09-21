@@ -14,16 +14,20 @@
     <button id="init">
         Инициализация
     </button>
+
+    <label>Количество эпох:</label>
+    <input id="countEpochs" type="number" min="1" step="100" value="1000">
+    <label>Коэф. обучения:</label>
+    <input id="teachKoef" type="number" min="0" max="1" step="0.01" value="0.01">
+
     <button id="teach" disabled>
         Обучение
     </button>
-    <label>Количество эпох:</label>
-    <input id="countProhodov" type="number" min="100" step="100" value="1000">
 
-    <br>
-    <input id="in1" type="number" min="0" step="100" value="1000">
-    <input id="in2" type="number" min="0" step="100" value="1000">
-    <input id="in3" type="number" min="0" step="100" value="1000">
+    <label>Тестовые данные:</label>
+    <input id="in1" type="number" min="0" step="1" value="1">
+    <input id="in2" type="number" min="0" step="1" value="1">
+    <input id="in3" type="number" min="0" step="1" value="1">
 
     <button id="test" disabled>
         Тест
@@ -33,24 +37,38 @@
 <div class="weights">
 <pre id="weights">Текущее значение весов:
 </pre>
-    <input id="weightsHidden" type="hidden">
 </div>
 
 <div class="errors">
     <table id="errorsTable">
+        <thead>
+        <tr>
+            <th colspan="3">Ошибки сети</th>
+        </tr>
         <tr>
             <th>
-                Ошибки сети
+                № итер.
+            </th>
+            <th>
+                Кол-во эпох
+            </th>
+            <th>
+                Значение ошибки
             </th>
         </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
     </table>
+</div>
+<div class="answer">
+    <pre></pre>
 </div>
 </body>
 
 <script>
     var currentWeightsValues;
-    // var currentFuncActValues;
-    // var currentAnswersValues;
     var counterIteration = 0;
 
     $("#init").click(function () {
@@ -64,26 +82,22 @@
             data: {do: 'init'},
             success: function (result) {
                 $("#errorsTable td").remove();
-                $("#errorsTable tr:not(:first-child)").remove();
+                $("#errorsTable tbody tr").remove();
+                $(".answer pre").text("");
 
                 let er = result['error'];
                 console.log("Ошибка сети: " + er);
 
-                // currentFuncActValues = result['funcAct'];
-                // currentAnswersValues = result['answers'];
-                // console.log(currentFuncActValues);
-                // console.log(currentAnswersValues);
-
                 let weights = result['weights'];
                 currentWeightsValues = weights;
-
-                // $("#weightsHidden").attr("value", weights);
 
                 let weightsStr = arrayToStr(weights);
                 $("#weights").text("Текущее значение весов: \n\n" + weightsStr);
 
-                $("#errorsTable tr:first").after("<tr><td>" + counterIteration + "</td>" + "<td>" + er + "</td></tr>");
+                $("#errorsTable tbody").html("<tr><td>" + counterIteration + "</td><td>1</td><td>" + er + "</td></tr>");
+
                 $("#teach").attr("disabled", false);
+                $("#test").attr("disabled", false);
             }
         });
     });
@@ -100,17 +114,15 @@
         $("#teach").attr("disabled", true);
         $("#test").attr("disabled", true);
         counterIteration++;
-        console.log(counterIteration);
 
-        let countProhodov = $("#countProhodov").val();
-
-        console.log(countProhodov);
+        let countEpochs = $("#countEpochs").val();
+        let teachKoef = $("#teachKoef").val();
 
         $.ajax({
             url: "neuro.php",
             type: 'POST',
             dataType: 'json',
-            data: {do: 'teach', weights: currentWeightsValues, countProhodov: countProhodov},
+            data: {do: 'teach', weights: currentWeightsValues, countEpochs: countEpochs, teachKoef: teachKoef},
             success: function (result) {
                 console.log(result);
                 let er = result['error'];
@@ -119,13 +131,10 @@
                 let weights = result['weights'];
                 currentWeightsValues = weights;
 
-                // $("#weightsHidden").attr("value", weights);
-
                 let weightsStr = arrayToStr(result['weights']);
                 $("#weights").text("Текущее значение весов: \n\n" + weightsStr);
 
-                $("#errorsTable tr:first").after("<tr><td>" + counterIteration + "</td>" + "<td>" + er + "</td></tr>");
-
+                $("#errorsTable tbody tr:first").before("<tr><td>" + counterIteration + "</td><td>" + countEpochs + "</td><td>" + er + "</td></tr>");
 
                 $("#teach").attr("disabled", false);
                 $("#test").attr("disabled", false);
@@ -136,14 +145,10 @@
     $("#test").click(function () {
         $("#teach").attr("disabled", true);
         $("#test").attr("disabled", true);
-        // counterIteration++;
-        // console.log(counterIteration);
 
         let in1 = $("#in1").val();
         let in2 = $("#in2").val();
         let in3 = $("#in3").val();
-
-        // console.log(countProhodov);
 
         $.ajax({
             url: "neuro.php",
@@ -152,20 +157,8 @@
             data: {do: 'test', weights: currentWeightsValues, in1: in1, in2: in2, in3: in3},
             success: function (result) {
                 console.log(result['answer']);
-                // console.log(result);
-                // let er = result['error'];
-                // console.log("Ошибка сети: " + er);
-                //
-                // let weights = result['weights'];
-                // currentWeightsValues = weights;
-                //
-                // $("#weightsHidden").attr("value", weights);
 
-                // let weightsStr = arrayToStr(result['weights']);
-                // $("#weights").text("Текущее значение весов: \n\n" + weightsStr);
-                //
-                // $("#errorsTable tr:first").after("<tr><td>" + counterIteration + "</td>" + "<td>" + er + "</td></tr>");
-                //
+                $(".answer pre").text("Ответ сети: \n\n" + arrayToStr(result['answer']));
                 $("#teach").attr("disabled", false);
                 $("#test").attr("disabled", false);
             }

@@ -54,7 +54,7 @@
     <property name="WebServerToolWindowPanel.toolwindow.show.date" value="false" />
     <property name="WebServerToolWindowPanel.toolwindow.show.permissions" value="false" />
     <property name="WebServerToolWindowPanel.toolwindow.show.size" value="false" />
-    <property name="last_opened_file_path" value="E:/verstka" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/neuron" />
     <property name="list.type.of.created.stylesheet" value="CSS" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
@@ -65,6 +65,9 @@
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\Учеба\Интеллектуальные системы\neuronochka\neuron" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="D:\Учеба\Интеллектуальные системы\neuronochka\neuron" />
     </key>
@@ -86,7 +89,7 @@
       <workItem from="1599800658362" duration="14531000" />
       <workItem from="1599859801183" duration="8685000" />
       <workItem from="1600668703799" duration="2292000" />
-      <workItem from="1600673791611" duration="3619000" />
+      <workItem from="1600673791611" duration="10498000" />
     </task>
     <servers />
   </component>
