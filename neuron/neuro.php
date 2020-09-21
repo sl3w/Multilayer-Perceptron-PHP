@@ -50,13 +50,14 @@ $weights = array(
     "w312" => 0.39,
 );
 
+$teachTest = true;
 if ($_POST['do'] == 'init') {
     $isTeach = false;
 
-//    startEpoch($weights, array(2, 1, 3), array(1));
-//    startEpoch($weights, array(1, 2, 1), array(0.5));
-//    startEpoch($weights, array(3, 2, 1), array(1));
-//    startEpoch($weights, array(1, 3, 2), array(0.5));
+    startExample($weights, array(2, 1, 3), array(1));
+    startExample($weights, array(1, 2, 1), array(0.5));
+    startExample($weights, array(3, 2, 1), array(1));
+    startExample($weights, array(1, 3, 2), array(0.5));
 
 //    startEpoch($weights, array(1, 2, 3), array(0));
 //    startEpoch($weights, array(1, 3, 2), array(0));
@@ -66,49 +67,49 @@ if ($_POST['do'] == 'init') {
 //    startEpoch($weights, array(3, 1, 2), array(1));
 
 
-    $numPrimer = 1;
-    startEpoch($weights, array(0, 0, 0), array(0));
-    $numPrimer++;
-    startEpoch($weights, array(2, 0, 0), array(0));
-    $numPrimer++;
-    startEpoch($weights, array(3, 0, 0), array(0));
-    $numPrimer++;
-    startEpoch($weights, array(0, 0, 1), array(0));
-    $numPrimer++;
-    startEpoch($weights, array(0, 0, 2), array(0));
-    $numPrimer++;
-    startEpoch($weights, array(0, 0, 3), array(0));
-    $numPrimer++;
-    startEpoch($weights, array(0, 1, 0), array(0));
-    $numPrimer++;
-    startEpoch($weights, array(0, 1, 1), array(1));
-    $numPrimer++;
-    startEpoch($weights, array(2, 1, 1), array(1));
-    $numPrimer++;
-    startEpoch($weights, array(3, 1, 1), array(1));
-    $numPrimer++;
-    startEpoch($weights, array(1, 0, 0), array(0));
-    $numPrimer++;
-    startEpoch($weights, array(2, 0, 0), array(0));
-    $numPrimer++;
-    startEpoch($weights, array(3, 0, 0), array(0));
-    $numPrimer++;
-    startEpoch($weights, array(1, 0, 1), array(1));
-    $numPrimer++;
-    startEpoch($weights, array(1, 2, 1), array(1));
-    $numPrimer++;
-    startEpoch($weights, array(1, 3, 1), array(1));
-    $numPrimer++;
-    startEpoch($weights, array(1, 1, 0), array(1));
-    $numPrimer++;
-    startEpoch($weights, array(1, 1, 2), array(1));
-    $numPrimer++;
-    startEpoch($weights, array(1, 1, 3), array(1));
-    $numPrimer++;
-    startEpoch($weights, array(1, 1, 1), array(1));
+//    $numPrimer = 1;
+//    startEpoch($weights, array(0, 0, 0), array(0));
+//    $numPrimer++;
+//    startEpoch($weights, array(2, 0, 0), array(0));
+//    $numPrimer++;
+//    startEpoch($weights, array(3, 0, 0), array(0));
+//    $numPrimer++;
+//    startEpoch($weights, array(0, 0, 1), array(0));
+//    $numPrimer++;
+//    startEpoch($weights, array(0, 0, 2), array(0));
+//    $numPrimer++;
+//    startEpoch($weights, array(0, 0, 3), array(0));
+//    $numPrimer++;
+//    startEpoch($weights, array(0, 1, 0), array(0));
+//    $numPrimer++;
+//    startEpoch($weights, array(0, 1, 1), array(1));
+//    $numPrimer++;
+//    startEpoch($weights, array(2, 1, 1), array(1));
+//    $numPrimer++;
+//    startEpoch($weights, array(3, 1, 1), array(1));
+//    $numPrimer++;
+//    startEpoch($weights, array(1, 0, 0), array(0));
+//    $numPrimer++;
+//    startEpoch($weights, array(2, 0, 0), array(0));
+//    $numPrimer++;
+//    startEpoch($weights, array(3, 0, 0), array(0));
+//    $numPrimer++;
+//    startEpoch($weights, array(1, 0, 1), array(1));
+//    $numPrimer++;
+//    startEpoch($weights, array(1, 2, 1), array(1));
+//    $numPrimer++;
+//    startEpoch($weights, array(1, 3, 1), array(1));
+//    $numPrimer++;
+//    startEpoch($weights, array(1, 1, 0), array(1));
+//    $numPrimer++;
+//    startEpoch($weights, array(1, 1, 2), array(1));
+//    $numPrimer++;
+//    startEpoch($weights, array(1, 1, 3), array(1));
+//    $numPrimer++;
+//    startEpoch($weights, array(1, 1, 1), array(1));
 
 
-    $er = calcError($answers, $ethalons);
+    $er = calcNetworkError($answers, $ethalons);
 
     $res['error'] = $er;
     $res['weights'] = $weights;
@@ -116,19 +117,20 @@ if ($_POST['do'] == 'init') {
 //    $res['answers'] = $yOuts;
     echo json_encode($res);
 
-} elseif ($_POST['do'] == 'teach') {
+} elseif ($_POST['do'] == 'teach' || $teachTest) {
     $isTeach = true;
 
-    $weights = $_POST['weights'];
+//    $weights = $_POST['weights'];
     $fs = $_POST['funcAct'];
 //    $yOuts = $_POST['answers'];
-    $countProhodov = $_POST['countProhodov'];
+//    $countProhodov = $_POST['countProhodov'];
 
-    for ($i = 0; $i < $countProhodov; $i++) {
-//        startEpoch($weights, array(2, 1, 3), array(1));
-//        startEpoch($weights, array(1, 2, 1), array(0.5));
-//        startEpoch($weights, array(3, 2, 1), array(1));
-//        startEpoch($weights, array(1, 3, 2), array(0.5));
+//    for ($i = 0; $i < $countProhodov; $i++) {
+//        $numPrimer = 1;
+        startExample($weights, array(2, 1, 3), array(1));
+        startExample($weights, array(1, 2, 1), array(0.5));
+        startExample($weights, array(3, 2, 1), array(1));
+        startExample($weights, array(1, 3, 2), array(0.5));
 
 //        startEpoch($weights, array(1, 2, 3), array(0));
 //        startEpoch($weights, array(1, 3, 2), array(0));
@@ -138,58 +140,58 @@ if ($_POST['do'] == 'init') {
 //        startEpoch($weights, array(3, 1, 2), array(1));
 
 
-        $numPrimer = 1;
-        startEpoch($weights, array(0, 0, 0), array(0), true);
-        $numPrimer++;
-        startEpoch($weights, array(2, 0, 0), array(0), true);
-        $numPrimer++;
-        startEpoch($weights, array(3, 0, 0), array(0), true);
-        $numPrimer++;
-        startEpoch($weights, array(0, 0, 1), array(0), true);
-        $numPrimer++;
-        startEpoch($weights, array(0, 0, 2), array(0), true);
-        $numPrimer++;
-        startEpoch($weights, array(0, 0, 3), array(0), true);
-        $numPrimer++;
-        startEpoch($weights, array(0, 1, 0), array(0), true);
-        $numPrimer++;
-        startEpoch($weights, array(0, 1, 1), array(1), true);
-        $numPrimer++;
-        startEpoch($weights, array(2, 1, 1), array(1), true);
-        $numPrimer++;
-        startEpoch($weights, array(3, 1, 1), array(1), true);
-        $numPrimer++;
-        startEpoch($weights, array(1, 0, 0), array(0), true);
-        $numPrimer++;
-        startEpoch($weights, array(2, 0, 0), array(0), true);
-        $numPrimer++;
-        startEpoch($weights, array(3, 0, 0), array(0), true);
-        $numPrimer++;
-        startEpoch($weights, array(1, 0, 1), array(1), true);
-        $numPrimer++;
-        startEpoch($weights, array(1, 2, 1), array(1), true);
-        $numPrimer++;
-        startEpoch($weights, array(1, 3, 1), array(1), true);
-        $numPrimer++;
-        startEpoch($weights, array(1, 1, 0), array(1), true);
-        $numPrimer++;
-        startEpoch($weights, array(1, 1, 2), array(1), true);
-        $numPrimer++;
-        startEpoch($weights, array(1, 1, 3), array(1), true);
-        $numPrimer++;
-        startEpoch($weights, array(1, 1, 1), array(1), true);
-    }
+//        $numPrimer = 1;
+//        startEpoch($weights, array(0, 0, 0), array(0), true);
+//        $numPrimer++;
+//        startEpoch($weights, array(2, 0, 0), array(0), true);
+//        $numPrimer++;
+//        startEpoch($weights, array(3, 0, 0), array(0), true);
+//        $numPrimer++;
+//        startEpoch($weights, array(0, 0, 1), array(0), true);
+//        $numPrimer++;
+//        startEpoch($weights, array(0, 0, 2), array(0), true);
+//        $numPrimer++;
+//        startEpoch($weights, array(0, 0, 3), array(0), true);
+//        $numPrimer++;
+//        startEpoch($weights, array(0, 1, 0), array(0), true);
+//        $numPrimer++;
+//        startEpoch($weights, array(0, 1, 1), array(1), true);
+//        $numPrimer++;
+//        startEpoch($weights, array(2, 1, 1), array(1), true);
+//        $numPrimer++;
+//        startEpoch($weights, array(3, 1, 1), array(1), true);
+//        $numPrimer++;
+//        startEpoch($weights, array(1, 0, 0), array(0), true);
+//        $numPrimer++;
+//        startEpoch($weights, array(2, 0, 0), array(0), true);
+//        $numPrimer++;
+//        startEpoch($weights, array(3, 0, 0), array(0), true);
+//        $numPrimer++;
+//        startEpoch($weights, array(1, 0, 1), array(1), true);
+//        $numPrimer++;
+//        startEpoch($weights, array(1, 2, 1), array(1), true);
+//        $numPrimer++;
+//        startEpoch($weights, array(1, 3, 1), array(1), true);
+//        $numPrimer++;
+//        startEpoch($weights, array(1, 1, 0), array(1), true);
+//        $numPrimer++;
+//        startEpoch($weights, array(1, 1, 2), array(1), true);
+//        $numPrimer++;
+//        startEpoch($weights, array(1, 1, 3), array(1), true);
+//        $numPrimer++;
+//        startEpoch($weights, array(1, 1, 1), array(1), true);
+//    }
 
     $isTeach = false;
 
     $answers = array();
     $ethalons = array();
 
-
-//    startEpoch($weights, array(2, 1, 3), array(1));
-//    startEpoch($weights, array(1, 2, 1), array(0.5));
-//    startEpoch($weights, array(3, 2, 1), array(1));
-//    startEpoch($weights, array(1, 3, 2), array(0.5));
+    $numPrimer = 1;
+    startExample($weights, array(2, 1, 3), array(1));
+    startExample($weights, array(1, 2, 1), array(0.5));
+    startExample($weights, array(3, 2, 1), array(1));
+    startExample($weights, array(1, 3, 2), array(0.5));
 
 //    startEpoch($weights, array(1, 2, 3), array(0));
 //    startEpoch($weights, array(1, 3, 2), array(0));
@@ -198,49 +200,49 @@ if ($_POST['do'] == 'init') {
 //    startEpoch($weights, array(3, 2, 1), array(1));
 //    startEpoch($weights, array(3, 1, 2), array(1));
 
-    $numPrimer = 1;
-    startEpoch($weights, array(0, 0, 0), array(0));
-    $numPrimer++;
-    startEpoch($weights, array(2, 0, 0), array(0));
-    $numPrimer++;
-    startEpoch($weights, array(3, 0, 0), array(0));
-    $numPrimer++;
-    startEpoch($weights, array(0, 0, 1), array(0));
-    $numPrimer++;
-    startEpoch($weights, array(0, 0, 2), array(0));
-    $numPrimer++;
-    startEpoch($weights, array(0, 0, 3), array(0));
-    $numPrimer++;
-    startEpoch($weights, array(0, 1, 0), array(0));
-    $numPrimer++;
-    startEpoch($weights, array(0, 1, 1), array(1));
-    $numPrimer++;
-    startEpoch($weights, array(2, 1, 1), array(1));
-    $numPrimer++;
-    startEpoch($weights, array(3, 1, 1), array(1));
-    $numPrimer++;
-    startEpoch($weights, array(1, 0, 0), array(0));
-    $numPrimer++;
-    startEpoch($weights, array(2, 0, 0), array(0));
-    $numPrimer++;
-    startEpoch($weights, array(3, 0, 0), array(0));
-    $numPrimer++;
-    startEpoch($weights, array(1, 0, 1), array(1));
-    $numPrimer++;
-    startEpoch($weights, array(1, 2, 1), array(1));
-    $numPrimer++;
-    startEpoch($weights, array(1, 3, 1), array(1));
-    $numPrimer++;
-    startEpoch($weights, array(1, 1, 0), array(1));
-    $numPrimer++;
-    startEpoch($weights, array(1, 1, 2), array(1));
-    $numPrimer++;
-    startEpoch($weights, array(1, 1, 3), array(1));
-    $numPrimer++;
-    startEpoch($weights, array(1, 1, 1), array(1));
+//    $numPrimer = 1;
+//    startEpoch($weights, array(0, 0, 0), array(0));
+//    $numPrimer++;
+//    startEpoch($weights, array(2, 0, 0), array(0));
+//    $numPrimer++;
+//    startEpoch($weights, array(3, 0, 0), array(0));
+//    $numPrimer++;
+//    startEpoch($weights, array(0, 0, 1), array(0));
+//    $numPrimer++;
+//    startEpoch($weights, array(0, 0, 2), array(0));
+//    $numPrimer++;
+//    startEpoch($weights, array(0, 0, 3), array(0));
+//    $numPrimer++;
+//    startEpoch($weights, array(0, 1, 0), array(0));
+//    $numPrimer++;
+//    startEpoch($weights, array(0, 1, 1), array(1));
+//    $numPrimer++;
+//    startEpoch($weights, array(2, 1, 1), array(1));
+//    $numPrimer++;
+//    startEpoch($weights, array(3, 1, 1), array(1));
+//    $numPrimer++;
+//    startEpoch($weights, array(1, 0, 0), array(0));
+//    $numPrimer++;
+//    startEpoch($weights, array(2, 0, 0), array(0));
+//    $numPrimer++;
+//    startEpoch($weights, array(3, 0, 0), array(0));
+//    $numPrimer++;
+//    startEpoch($weights, array(1, 0, 1), array(1));
+//    $numPrimer++;
+//    startEpoch($weights, array(1, 2, 1), array(1));
+//    $numPrimer++;
+//    startEpoch($weights, array(1, 3, 1), array(1));
+//    $numPrimer++;
+//    startEpoch($weights, array(1, 1, 0), array(1));
+//    $numPrimer++;
+//    startEpoch($weights, array(1, 1, 2), array(1));
+//    $numPrimer++;
+//    startEpoch($weights, array(1, 1, 3), array(1));
+//    $numPrimer++;
+//    startEpoch($weights, array(1, 1, 1), array(1));
 
 
-    $er = calcError($answers, $ethalons);
+    $er = calcNetworkError($answers, $ethalons);
 
     $res['error'] = $er;
     $res['weights'] = $weights;
@@ -253,14 +255,14 @@ if ($_POST['do'] == 'init') {
     $in2 = $_POST['in2'];
     $in3 = $_POST['in3'];
 
-    $ans = startEpoch($weights, array($in1, $in2, $in3));
+    $ans = startExample($weights, array($in1, $in2, $in3));
 
     $res['answer'] = $ans;
 //    $res['weights'] = $weights;
     echo json_encode($res);
 }
 
-function startEpoch(&$weights, $x, $eth = false, $skipForward = false)
+function startExample(&$weights, $x, $eth = false, $skipForward = false)
 {
     global $isTeach, $fs, $answers, $ethalons;
     generateX($x);
@@ -281,10 +283,9 @@ function startEpoch(&$weights, $x, $eth = false, $skipForward = false)
         $ds["d" . (COUNT_SLOY + 1) . ($k + 1)] = $d * $proiz;
     }
 
-
     if ($isTeach) {
         calcErrors($ds, $weights);
-
+        pre($ds, 1);
         $newWeights = weightCorrection($weights, $x, $ds);
 
         $weights = $newWeights;
@@ -313,10 +314,16 @@ function firstForward(&$weights, $x)
                 if (!key_exists($weightKey, $weights)) {
                     $weights[$weightKey] = randWeight();
                 }
+//                if ($i == COUNT_SLOY + 1) {
+//                    pre(getValueFuncAct($i - 1, $k));
+//                    pre($weights[$weightKey]);
+//                }
                 $S += getValueFuncAct($i - 1, $k) * $weights[$weightKey];
 //                $S += 1 * getRandDopWeight($weightKey);
             }
 
+//            if ($i == COUNT_SLOY + 1)
+//                pre($S, 1);
             setValueFuncAct($i, $j, calcFa($S));
 
             if ($i == COUNT_SLOY + 1)
@@ -440,7 +447,7 @@ function calcProizvod($x)
     return $x * (1 - $x);
 }
 
-function calcError($answers, $ethalons)
+function calcNetworkError($answers, $ethalons)
 {
     $sum = 0;
     foreach ($answers as $k => $answerVector) {
