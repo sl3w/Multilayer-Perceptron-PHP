@@ -1,20 +1,21 @@
 <?php
-define("COUNT_SLOY", 2);
 define("COUNT_ON_SLOY", 2);
 define("COUNT_OUTPUTS", 2);
 define("FUNC_KOEF", 0.3);
 
-global $isTeach, $answers, $ethalons, $funcsAct, $numPrimer, $teachKoef;
-
+global $isTeach, $answers, $ethalons, $funcsAct, $numPrimer, $teachKoef, $hideLayCount;
+//$hideLayCount = 2;
 $isTeach = false;
 
 //global $dopWeight;
 //$dopWeight = array();
 
 //$teachTest = false;
-if ($_POST['do'] == 'init') {
-    $isTeach = false;
 
+$do = $_POST['do'];
+$hideLayCount = $_POST['hideLayCount'];
+
+if ($do == 'init') {
     $numPrimer = 1;
     goEpoch($weights);
 
@@ -24,7 +25,7 @@ if ($_POST['do'] == 'init') {
     $res['weights'] = $weights;
     echo json_encode($res);
 
-} elseif ($_POST['do'] == 'teach' /*|| $teachTest*/) {
+} elseif ($do == 'teach' /*|| $teachTest*/) {
     $isTeach = true;
 
     $weights = $_POST['weights'];
@@ -50,7 +51,7 @@ if ($_POST['do'] == 'init') {
     $res['weights'] = $weights;
     echo json_encode($res);
 
-} elseif ($_POST['do'] == 'test') {
+} elseif ($do == 'test') {
     $weights = $_POST['weights'];
 
     $in1 = $_POST['in1'];
@@ -65,9 +66,9 @@ if ($_POST['do'] == 'init') {
 
 function startExample(&$weights, $x, $eth = false)
 {
-    global $isTeach, $answers, $ethalons, $numPrimer;
+    global $isTeach, $answers, $ethalons, $numPrimer, $hideLayCount;
     generateX($x);
-    $yOut = firstForward($weights, $x /*, $bigSs*/);
+    $yOut = firstForward($weights, $x);
 
     $answers[] = $yOut;
     $ethalons[] = $eth;
@@ -81,7 +82,7 @@ function startExample(&$weights, $x, $eth = false)
 
         $d = $value - $eth[$k];
 
-        $ds["d" . (COUNT_SLOY + 1) . ($k + 1)] = $d * $proiz;
+        $ds["d" . ($hideLayCount + 1) . ($k + 1)] = $d * $proiz;
     }
 
     if ($isTeach) {
@@ -102,8 +103,9 @@ function generateX($x)
 
 function firstForward(&$weights, $x)
 {
-    for ($i = 1; $i <= COUNT_SLOY + 1; $i++) {
-        $jMax = $i == COUNT_SLOY + 1 ? COUNT_OUTPUTS : COUNT_ON_SLOY;
+    global $hideLayCount;
+    for ($i = 1; $i <= $hideLayCount + 1; $i++) {
+        $jMax = $i == $hideLayCount + 1 ? COUNT_OUTPUTS : COUNT_ON_SLOY;
         for ($j = 1; $j <= $jMax; $j++) {
 
             $kMax = $i == 1 ? count($x) : COUNT_ON_SLOY;
@@ -120,7 +122,7 @@ function firstForward(&$weights, $x)
 
             setValueFuncAct($i, $j, calcFuncActivation($S));
 
-            if ($i == COUNT_SLOY + 1)
+            if ($i == $hideLayCount + 1)
                 $y[] = calcFuncActivation($S);
         }
     }
@@ -140,9 +142,10 @@ function firstForward(&$weights, $x)
 
 function calcBackPropErrors(&$ds, $weights)
 {
-    for ($i = COUNT_SLOY; $i > 0; $i--) {
+    global $hideLayCount;
+    for ($i = $hideLayCount; $i > 0; $i--) {
         for ($j = 1; $j <= COUNT_ON_SLOY; $j++) {
-            $kMax = $i == COUNT_SLOY ? COUNT_OUTPUTS : COUNT_ON_SLOY;
+            $kMax = $i == $hideLayCount ? COUNT_OUTPUTS : COUNT_ON_SLOY;
 
             $curD = 0;
             for ($k = 1; $k <= $kMax; $k++) {
@@ -160,11 +163,11 @@ function calcBackPropErrors(&$ds, $weights)
 
 function weightCorrection($weights, $x, $ds)
 {
-    global $teachKoef;
+    global $teachKoef, $hideLayCount;
     $newWeights = array();
 
-    for ($i = 1; $i <= COUNT_SLOY + 1; $i++) {
-        $jMax = $i == COUNT_SLOY + 1 ? COUNT_OUTPUTS : COUNT_ON_SLOY;
+    for ($i = 1; $i <= $hideLayCount + 1; $i++) {
+        $jMax = $i == $hideLayCount + 1 ? COUNT_OUTPUTS : COUNT_ON_SLOY;
         for ($j = 1; $j <= $jMax; $j++) {
 
             $multDsA = $ds["d" . $i . $j] * $teachKoef * (-1);

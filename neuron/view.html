@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+    <title>Нейроночка</title>
     <meta charset="UTF-8">
-    <title>Title</title>
 
     <link rel="stylesheet" href="/neuron/mystyle.css">
 </head>
@@ -11,14 +11,16 @@
 
 <body>
 <div class="buttons">
+    <label>Кол-во скрытых слоев:</label>
+    <input id="hideLayCount" type="number" min="1" max="10" value="2">
     <button id="init">
         Инициализация
     </button>
 
     <label>Количество эпох:</label>
-    <input id="countEpochs" type="number" min="1" step="100" value="1000">
+    <input id="countEpochs" type="number" min="1" step="100" value="1000" max="30000">
     <label>Коэф. обучения:</label>
-    <input id="teachKoef" type="number" min="0" max="1" step="0.01" value="0.01">
+    <input id="teachKoef" type="number" min="0" max="1" step="0.01" value="0.1">
 
     <button id="teach" disabled>
         Обучение
@@ -43,7 +45,7 @@
     <table id="errorsTable">
         <thead>
         <tr>
-            <th colspan="3">Ошибки сети</th>
+            <th colspan="4">Ошибки сети</th>
         </tr>
         <tr>
             <th>
@@ -51,6 +53,9 @@
             </th>
             <th>
                 Кол-во эпох
+            </th>
+            <th>
+                Коэф. обучения
             </th>
             <th>
                 Значение ошибки
@@ -70,16 +75,20 @@
 <script>
     var currentWeightsValues;
     var counterIteration = 0;
+    var hideLayCount = 0;
 
     $("#init").click(function () {
         $("#teach").attr("disabled", true);
         $("#test").attr("disabled", true);
-        counterIteration = 1;
+        counterIteration = 0;
+
+        hideLayCount = $("#hideLayCount").val();
+
         $.ajax({
             url: "neuro.php",
             type: 'POST',
             dataType: 'json',
-            data: {do: 'init'},
+            data: {do: 'init', hideLayCount: hideLayCount},
             success: function (result) {
                 $("#errorsTable td").remove();
                 $("#errorsTable tbody tr").remove();
@@ -94,7 +103,7 @@
                 let weightsStr = arrayToStr(weights);
                 $("#weights").text("Текущее значение весов: \n\n" + weightsStr);
 
-                $("#errorsTable tbody").html("<tr><td>" + counterIteration + "</td><td>1</td><td>" + er + "</td></tr>");
+                $("#errorsTable tbody").html("<tr><td>" + counterIteration + "</td><td>1</td><td>–</td><td>" + er + "</td></tr>");
 
                 $("#teach").attr("disabled", false);
                 $("#test").attr("disabled", false);
@@ -118,11 +127,12 @@
         let countEpochs = $("#countEpochs").val();
         let teachKoef = $("#teachKoef").val();
 
+        console.log(hideLayCount);
         $.ajax({
             url: "neuro.php",
             type: 'POST',
             dataType: 'json',
-            data: {do: 'teach', weights: currentWeightsValues, countEpochs: countEpochs, teachKoef: teachKoef},
+            data: {do: 'teach', weights: currentWeightsValues, countEpochs: countEpochs, teachKoef: teachKoef, hideLayCount: hideLayCount},
             success: function (result) {
                 console.log(result);
                 let er = result['error'];
@@ -134,7 +144,7 @@
                 let weightsStr = arrayToStr(result['weights']);
                 $("#weights").text("Текущее значение весов: \n\n" + weightsStr);
 
-                $("#errorsTable tbody tr:first").before("<tr><td>" + counterIteration + "</td><td>" + countEpochs + "</td><td>" + er + "</td></tr>");
+                $("#errorsTable tbody tr:first").before("<tr><td>" + counterIteration + "</td><td>" + countEpochs + "</td><td>" + teachKoef + "</td><td>" + er + "</td></tr>");
 
                 $("#teach").attr("disabled", false);
                 $("#test").attr("disabled", false);
@@ -154,7 +164,7 @@
             url: "neuro.php",
             type: 'POST',
             dataType: 'json',
-            data: {do: 'test', weights: currentWeightsValues, in1: in1, in2: in2, in3: in3},
+            data: {do: 'test', weights: currentWeightsValues, hideLayCount: hideLayCount, in1: in1, in2: in2, in3: in3},
             success: function (result) {
                 console.log(result['answer']);
 
