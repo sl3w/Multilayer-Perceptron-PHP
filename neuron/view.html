@@ -8,71 +8,81 @@
 </head>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
-<body>
-<div class="buttons">
-    <label>Кол-во скрытых слоев:</label>
-    <input id="hideLayCount" type="number" min="1" max="5" value="1">
-    <button id="init">
-        Инициализация
-    </button>
 
-    <label>Количество эпох:</label>
-    <input id="countEpochs" type="number" min="1" step="100" value="1000" max="30000">
-    <label>Коэф. обучения:</label>
-    <input id="teachKoef" type="number" min="0" max="1" step="0.01" value="0.1">
+<div style="flex-direction: column">
+    <div>
+        <div class="buttons">
+            <label>Кол-во скрытых слоев:</label>
+            <input id="hideLayCount" type="number" min="1" max="5" value="1">
+            <button id="init">
+                Инициализация
+            </button>
 
-    <div style="display: flex">
-        <input id="stopTeach" type="checkbox"><label for="stopTeach">Остановить</label>
+            <label>Количество эпох:</label>
+            <input id="countEpochs" type="number" min="1" step="100" value="1000" max="30000">
+            <label>Коэф. обучения:</label>
+            <input id="teachKoef" type="number" min="0" max="1" step="0.01" value="0.1">
+
+            <div style="display: flex">
+                <input id="stopTeach" type="checkbox"><label for="stopTeach">Остановить</label>
+            </div>
+            <button id="teach" disabled>
+                Обучение
+            </button>
+
+
+            <label>Тестовые данные:</label>
+            <input id="in1" type="number" min="0" step="1" value="1">
+            <input id="in2" type="number" min="0" step="1" value="1">
+            <input id="in3" type="number" min="0" step="1" value="1">
+            <input id="in4" type="number" min="0" step="1" value="1">
+
+            <button id="test" class="test" disabled>
+                Тест
+            </button>
+
+            <div class="answer">
+                <pre></pre>
+            </div>
+        </div>
+
+        <div class="errors">
+            <table id="errorsTable">
+                <thead>
+                <tr>
+                    <th colspan="4">Ошибки сети</th>
+                </tr>
+                <tr>
+                    <th>
+                        № итер.
+                    </th>
+                    <th>
+                        Кол-во эпох
+                    </th>
+                    <th>
+                        Коэф. обучения
+                    </th>
+                    <th>
+                        Значение ошибки
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div id="curve_chart" style="width: 800px; height: 500px"></div>
     </div>
-    <button id="teach" disabled>
-        Обучение
-    </button>
-
-
-    <label>Тестовые данные:</label>
-    <input id="in1" type="number" min="0" step="1" value="1">
-    <input id="in2" type="number" min="0" step="1" value="1">
-    <input id="in3" type="number" min="0" step="1" value="1">
-
-    <button id="test" disabled>
-        Тест
-    </button>
-</div>
-
-<div class="weights">
-<pre id="weights">Текущее значение весов:
-</pre>
-</div>
-
-<div class="errors">
-    <table id="errorsTable">
-        <thead>
-        <tr>
-            <th colspan="4">Ошибки сети</th>
-        </tr>
-        <tr>
-            <th>
-                № итер.
-            </th>
-            <th>
-                Кол-во эпох
-            </th>
-            <th>
-                Коэф. обучения
-            </th>
-            <th>
-                Значение ошибки
-            </th>
-        </tr>
-        </thead>
-        <tbody>
-
-        </tbody>
-    </table>
-</div>
-<div class="answer">
-    <pre></pre>
+    <div>
+        <div class="weights">
+            <pre id="weights">Текущее значение весов:
+            </pre>
+        </div>
+    </div>
 </div>
 </body>
 
@@ -81,10 +91,14 @@
     var counterIteration = 0;
     var hideLayCount = 0;
 
+    var errorsStorage = [['Итерация', 'Значение ошибки'], [0,0]];
+
+
     $("#init").click(function () {
         $("#teach").attr("disabled", true);
         $("#test").attr("disabled", true);
         counterIteration = 0;
+        errorsStorage = [['Итерация', 'Значение ошибки']];
 
         hideLayCount = $("#hideLayCount").val();
 
@@ -108,6 +122,9 @@
                 $("#weights").text("Текущее значение весов: \n\n" + weightsStr);
 
                 $("#errorsTable tbody").html("<tr><td>" + counterIteration + "</td><td>1</td><td>–</td><td>" + er + "</td></tr>");
+
+                errorsStorage.push([counterIteration, er]);
+                drawChart();
 
                 $("#teach").attr("disabled", false);
                 $("#test").attr("disabled", false);
@@ -157,6 +174,9 @@
 
                 $("#errorsTable tbody tr:first").before("<tr><td>" + counterIteration + "</td><td>" + countEpochs + "</td><td>" + teachKoef + "</td><td>" + er + "</td></tr>");
 
+                errorsStorage.push([counterIteration, er]);
+                drawChart();
+
                 $("#teach").attr("disabled", false);
                 $("#test").attr("disabled", false);
 
@@ -176,12 +196,21 @@
         let in1 = $("#in1").val();
         let in2 = $("#in2").val();
         let in3 = $("#in3").val();
+        let in4 = $("#in4").val();
 
         $.ajax({
             url: "neuro.php",
             type: 'POST',
             dataType: 'json',
-            data: {do: 'test', weights: currentWeightsValues, hideLayCount: hideLayCount, in1: in1, in2: in2, in3: in3},
+            data: {
+                do: 'test',
+                weights: currentWeightsValues,
+                hideLayCount: hideLayCount,
+                in1: in1,
+                in2: in2,
+                in3: in3,
+                in4: in4
+            },
             success: function (result) {
                 console.log(result['answer']);
 
@@ -191,5 +220,24 @@
             }
         });
     });
+
+    // Load the Visualization API and the corechart package.
+    google.charts.load('current', {'packages': ['corechart']});
+
+    google.charts.setOnLoadCallback(drawChart);
+
+    function drawChart() {
+        var data = google.visualization.arrayToDataTable(errorsStorage);
+
+        var options = {
+            title: 'График ошибки',
+            curveType: 'function',
+            legend: {position: 'top'}
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+
+        chart.draw(data, options);
+    }
 </script>
 </html>

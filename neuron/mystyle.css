@@ -3,6 +3,7 @@ body {
 }
 
 div {
+    max-width: 100%;
     display: flex;
     margin-right: 30px;
 }
@@ -26,4 +27,12 @@ div {
 
 .errors td {
     text-align: center;
+}
+
+button.test {
+    margin-bottom: 10px;
+}
+
+.answer, #curve_chart {
+    margin-right: 0;
 }

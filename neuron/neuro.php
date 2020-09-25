@@ -74,8 +74,9 @@ if ($do == 'init') {
     $in1 = $_POST['in1'];
     $in2 = $_POST['in2'];
     $in3 = $_POST['in3'];
+    $in4 = $_POST['in4'];
 
-    $ans = startExample($weights, array($in1, $in2, $in3));
+    $ans = startExample($weights, array($in1, $in2, $in3, $in4));
 
     $res['answer'] = $ans;
     echo json_encode($res);
