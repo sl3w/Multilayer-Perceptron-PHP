@@ -33,6 +33,16 @@ button.test {
     margin-bottom: 10px;
 }
 
-.answer, #curve_chart {
+.answer, #curve_chart, .hideIterat {
     margin-right: 0;
+}
+
+.wrapper, .line-chart {
+    flex-direction: column;
+}
+
+#hideIterat {
+    max-width: 50px;
+    text-align: center;
+    margin-left: 10px;
 }

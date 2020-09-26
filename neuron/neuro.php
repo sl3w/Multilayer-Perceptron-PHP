@@ -3,15 +3,17 @@ define("COUNT_ON_SLOY", 4);
 define("COUNT_OUTPUTS", 3);
 define("FUNC_KOEF", 0.3);
 
-global $isTeach, $answers, $ethalons, $funcsAct, $numPrimer, $teachKoef, $hideLayCount;
-//$hideLayCount = 2;
+global $isTeach, $numPrimer, $teachKoef, $hideLayCount;
 $isTeach = false;
+
+global $answers, $ethalons, $funcsAct, $dopWeights;
 
 //global $dopWeight;
 //$dopWeight = array();
 
 //$teachTest = false;
 
+global $do;
 $do = $_POST['do'];
 $hideLayCount = $_POST['hideLayCount'];
 
@@ -29,8 +31,8 @@ $hideLayCount = $_POST['hideLayCount'];
 ////    "w123" => 0.41,
 ////    "w223" => -0.12,
 //);
-
-global $do;
+//global $res;
+//global $do;
 //$do = 'init';
 if ($do == 'init') {
     $numPrimer = 1;
@@ -40,12 +42,15 @@ if ($do == 'init') {
 
     $res['error'] = $er;
     $res['weights'] = $weights;
+    $res['dopWeights'] = $dopWeights;
+    //$res['fs'] = $funcsAct;
     echo json_encode($res);
 
 } elseif ($do == 'teach' /*|| $teachTest*/) {
     $isTeach = true;
 
     $weights = $_POST['weights'];
+    $dopWeights = $_POST['dopWeights'];
     $countEpochs = $_POST['countEpochs'];
     $teachKoef = $_POST['teachKoef'];
 
@@ -66,18 +71,21 @@ if ($do == 'init') {
 
     $res['error'] = $er;
     $res['weights'] = $weights;
+    $res['dopWeights'] = $dopWeights;
     echo json_encode($res);
 
 } elseif ($do == 'test') {
     $weights = $_POST['weights'];
+    $dopWeights = $_POST['dopWeights'];
 
     $in1 = $_POST['in1'];
-    $in2 = $_POST['in2'];
-    $in3 = $_POST['in3'];
-    $in4 = $_POST['in4'];
+//    $in2 = $_POST['in2'];
+//    $in3 = $_POST['in3'];
+//    $in4 = $_POST['in4'];
 
-    $ans = startExample($weights, array($in1, $in2, $in3, $in4));
+    $ans = startExample($weights, $in1);
 
+    $res['in'] = $in1;
     $res['answer'] = $ans;
     echo json_encode($res);
 }
@@ -86,7 +94,7 @@ function startExample(&$weights, $x, $eth = false)
 {
     global $isTeach, $answers, $ethalons, $numPrimer, $hideLayCount;
     generateX($x);
-    $yOut = firstForward($weights, $x);
+    $yOut = firstForward($weights, count($x));
 
     $answers[] = $yOut;
     $ethalons[] = $eth;
@@ -96,11 +104,9 @@ function startExample(&$weights, $x, $eth = false)
     }
 
     foreach ($yOut as $k => $value) {
-        $proiz = calcProizvod($value);
-
         $d = $value - $eth[$k];
 
-        $ds["d" . ($hideLayCount + 1) . ($k + 1)] = $d * $proiz;
+        $ds["d" . ($hideLayCount + 1) . ($k + 1)] = $d * calcProizvod($value);
     }
 
     if ($isTeach) {
@@ -109,6 +115,8 @@ function startExample(&$weights, $x, $eth = false)
         $newWeights = weightCorrection($weights, $x, $ds);
 
         $weights = $newWeights;
+
+        dopWeightsCorrection($ds);
     }
     $numPrimer++;
 }
@@ -120,47 +128,39 @@ function generateX($x)
     }
 }
 
-function firstForward(&$weights, $x)
+function firstForward(&$weights, $xCount)
 {
-    global $hideLayCount;
+    global $hideLayCount, $dopWeights;
     for ($i = 1; $i <= $hideLayCount + 1; $i++) {
         $jMax = $i == $hideLayCount + 1 ? COUNT_OUTPUTS : COUNT_ON_SLOY;
         for ($j = 1; $j <= $jMax; $j++) {
 
-            $kMax = $i == 1 ? count($x) : COUNT_ON_SLOY;
+            $kMax = $i == 1 ? $xCount : COUNT_ON_SLOY;
 
-            $S = 0;
+            $smtr = 0;
             for ($k = 1; $k <= $kMax; $k++) {
                 $weightKey = "w" . $i . $j . $k;
 
                 if (!key_exists($weightKey, $weights)) {
                     $weights[$weightKey] = getRandWeight();
-                    global $do;
-                    if ($do != 'init')
-                    die();
                 }
-                $S += getValueFuncAct($i - 1, $k) * $weights[$weightKey];
+                $smtr += getValueFuncAct($i - 1, $k) * $weights[$weightKey];
             }
 
-            setValueFuncAct($i, $j, calcFuncActivation($S));
+            if (!key_exists($j, $dopWeights[$i])) {
+                $dopWeights[$i][$j] = getRandWeight();
+            }
+            //$smtr += $dopWeights[$i][$j];
+
+            setValueFuncAct($i, $j, calcFuncActivation($smtr));
 
             if ($i == $hideLayCount + 1)
-                $y[] = calcFuncActivation($S);
+                $y[] = calcFuncActivation($smtr);
         }
     }
 
     return $y;
 }
-
-//function getRandDopWeight($k)
-//{
-//    global $dopWeight;
-//    if (!key_exists($k, $dopWeight)) {
-//        $dopWeight["d" . $k] = getRandWeight();
-//    }
-//    pre($dopWeight);
-//    return $dopWeight["d" . $k];
-//}
 
 function calcBackPropErrors(&$ds, $weights)
 {
@@ -204,8 +204,21 @@ function weightCorrection($weights, $x, $ds)
             }
         }
     }
-
     return $newWeights;
+}
+
+function dopWeightsCorrection($ds)
+{
+    global $dopWeights, $teachKoef;
+
+    $faBy1 = calcFuncActivation(1);
+    foreach ($dopWeights as $layNum => $layWeight) {
+        foreach ($layWeight as $neurNum => $dopWeight)
+            if ($layNum == "1")
+                $dopWeights[$layNum][$neurNum] = $dopWeight - $ds["d" . $layNum . $neurNum] * $teachKoef;
+            else
+                $dopWeights[$layNum][$neurNum] = $dopWeight - $ds["d" . $layNum . $neurNum] * $teachKoef * $faBy1;
+    }
 }
 
 
@@ -224,18 +237,6 @@ function calcProizvod($x)
     return $x * (1 - $x);
 }
 
-$x1 = array(
-  array(0.49703,0.499170,0.502369)
-);
-
-$x2 = array(
-    array(1,0,0)
-);
-
-//pre($x1);
-//pre($x2);
-//
-//pre(calcNetworkError($x1, $x2));
 function calcNetworkError($answers, $ethalons)
 {
     $sum = 0;
@@ -262,60 +263,54 @@ function setValueFuncAct($i, $j, $value)
 
 function goEpoch(&$weights)
 {
-    $handle = fopen("iris.data", "r");
+    $fileName = 'iris.data';
+
+    $handle = fopen($fileName, "r");
     while (!feof($handle)) {
         $buffer = fgets($handle, 4096);
         $exam = explode(",", trim($buffer));
-//    pre($exam);
-//    $eth = array(0,0,0,0,0,0,0,0);
-        $et = $exam[count($exam) - 1];
+
+
+//        $eth = array(0,0,0,0,0,0,0);
 //        if($et == 0 || $et == 1)
 //            continue;
-//        $eth[$et - 2] = 1;
-        switch ($et) {
-            case "Iris-setosa":
-                $eth = array(1,0,0);
-                break;
-            case "Iris-versicolor":
-                $eth = array(0,1,0);
-                break;
-            case "Iris-virginica":
-                $eth = array(0,0,1);
-                break;
+//        $eth[$et] = 1;
+
+
+        if ($fileName == 'balance.data') {
+            $et = $exam[0];
+            switch ($et) {
+                case "R":
+                    $eth = array(0, 0, 1);
+                    break;
+                case "L":
+                    $eth = array(1, 0, 0);
+                    break;
+                case "B":
+                    $eth = array(0, 1, 0);
+                    break;
+            }
+            $xs = array_slice($exam, 1);
+        } elseif ($fileName == 'iris.data') {
+            $et = $exam[count($exam) - 1];
+            switch ($et) {
+                case "Iris-setosa":
+                    $eth = array(1, 0, 0);
+                    break;
+                case "Iris-versicolor":
+                    $eth = array(0, 1, 0);
+                    break;
+                case "Iris-virginica":
+                    $eth = array(0, 0, 1);
+                    break;
+            }
+
+            $xs = array_slice($exam, 0, count($exam) - 1);
         }
 
-        $xs = array_splice($exam, 0, count($exam) - 1);
-//        pre($xs);
-//        pre($eth);
-//        die();
         startExample($weights, $xs, $eth);
-//        break;
     }
     fclose($handle);
-
-//    startExample($weights, array(5.1,3.5,1.4,0.2), array(1));
-
-
-//    startExample($weights, array(0, 0, 0), array(1, 0));
-//    startExample($weights, array(2, 0, 0), array(1, 0));
-//    startExample($weights, array(3, 0, 0), array(1, 0));
-//    startExample($weights, array(0, 0, 1), array(1, 0));
-//    startExample($weights, array(0, 0, 2), array(1, 0));
-//    startExample($weights, array(0, 0, 3), array(1, 0));
-//    startExample($weights, array(0, 1, 0), array(1, 0));
-//    startExample($weights, array(0, 1, 1), array(0, 1));
-//    startExample($weights, array(2, 1, 1), array(0, 1));
-//    startExample($weights, array(3, 1, 1), array(0, 1));
-//    startExample($weights, array(1, 0, 0), array(1, 0));
-//    startExample($weights, array(2, 0, 0), array(1, 0));
-//    startExample($weights, array(3, 0, 0), array(1, 0));
-//    startExample($weights, array(1, 0, 1), array(0, 1));
-//    startExample($weights, array(1, 2, 1), array(0, 1));
-//    startExample($weights, array(1, 3, 1), array(0, 1));
-//    startExample($weights, array(1, 1, 0), array(0, 1));
-//    startExample($weights, array(1, 1, 2), array(0, 1));
-//    startExample($weights, array(1, 1, 3), array(0, 1));
-//    startExample($weights, array(1, 1, 1), array(0, 1));
 }
 
 function pre($var, $die = false)
@@ -326,87 +321,3 @@ function pre($var, $die = false)
     if ($die)
         die('Debug in PRE');
 }
-
-//function ulogging($input, $logname = 'debug', $dt = false)
-//{
-//    $endLine = "\r\n"; #PHP_EOL не используется, т.к. иногда это нужно конфигурировать это
-//
-//    $fp = fopen('' . $logname . '.txt', "a+");
-//
-//    if (is_string($input)) {
-//        $writeStr = $input;
-//    } else {
-//        $writeStr = print_r($input, true);
-//    }
-//
-//    if ($dt) {
-//        fwrite($fp, date('d.m.Y H:i:s') . $endLine);
-//    }
-//
-//    fwrite($fp, $writeStr . $endLine);
-//
-//    fclose($fp);
-//    return true;
-//}
-
-//    $handle = fopen("iris.data", "r");
-//    while (!feof($handle)) {
-//        $buffer = fgets($handle, 4096);
-//        $exam = explode(",", trim($buffer));
-////    pre($exam);
-////    $eth = array(0,0,0,0,0,0,0,0,0,0);
-//        $et = $exam[count($exam) - 1];
-//        switch ($et) {
-//            case "Iris-setosa":
-//                $eth = array(1,0,0);
-//                break;
-//            case "Iris-versicolor":
-//                $eth = array(0,1,0);
-//                break;
-//            case "Iris-virginica":
-//                $eth = array(0,0,1);
-//                break;
-//        }
-//
-//        $xs = array_splice($exam, 0, count($exam) - 1);
-//        pre($xs);
-//        pre($eth);
-//        die();
-////        startExample($weights, $xs, $eth);
-//    }
-//    fclose($handle);
-
-
-//$hideLayCount = 1;
-//$teachKoef = 0.2;
-//
-//$numPrimer = 1;
-//goEpoch($weights);
-//
-//$er = calcNetworkError($answers, $ethalons);
-//
-//pre($er);
-//pre($weights);
-//
-//$isTeach = true;
-//
-//for($i = 0; $i < 2000; $i++) {
-//    $numPrimer = 1;
-//    goEpoch($weights);
-//}
-//
-//$isTeach = false;
-//
-//$answers=array();
-//$ethalons=array();
-//goEpoch($weights);
-//
-//$er = calcNetworkError($answers, $ethalons);
-//pre($er);
-//pre($weights);
-//
-//$isTeach = true;
-//
-//$numPrimer = 1;
-//goEpoch($weights);
-//pre($weights);

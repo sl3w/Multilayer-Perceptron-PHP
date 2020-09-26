@@ -5,13 +5,16 @@
     <meta charset="UTF-8">
 
     <link rel="stylesheet" href="/neuron/mystyle.css">
+
+
 </head>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
+<script type="text/javascript" src="script.js"></script>
 
-<div style="flex-direction: column">
+<div class="wrapper">
     <div>
         <div class="buttons">
             <label>Кол-во скрытых слоев:</label>
@@ -20,13 +23,13 @@
                 Инициализация
             </button>
 
-            <label>Количество эпох:</label>
-            <input id="countEpochs" type="number" min="1" step="100" value="1000" max="30000">
+            <label>Количество эпох на итерацию:</label>
+            <input id="countEpochs" type="number" min="0" step="100" value="100" max="1000">
             <label>Коэф. обучения:</label>
             <input id="teachKoef" type="number" min="0" max="1" step="0.01" value="0.1">
 
             <div style="display: flex">
-                <input id="stopTeach" type="checkbox"><label for="stopTeach">Остановить</label>
+                <input id="stopTeach" type="checkbox" checked><label for="stopTeach">Остановить</label>
             </div>
             <button id="teach" disabled>
                 Обучение
@@ -34,10 +37,7 @@
 
 
             <label>Тестовые данные:</label>
-            <input id="in1" type="number" min="0" step="1" value="1">
-            <input id="in2" type="number" min="0" step="1" value="1">
-            <input id="in3" type="number" min="0" step="1" value="1">
-            <input id="in4" type="number" min="0" step="1" value="1">
+            <input id="inputTest" type="text">
 
             <button id="test" class="test" disabled>
                 Тест
@@ -70,12 +70,17 @@
                 </tr>
                 </thead>
                 <tbody>
-
                 </tbody>
             </table>
         </div>
 
-        <div id="curve_chart" style="width: 800px; height: 500px"></div>
+        <div class="line-chart">
+            <div id="curve_chart" style="width: 800px; height: 500px"></div>
+            <div class="hideIterat" style="max-height: max-content">
+                <label>Скрыть первые итерации на графике: </label>
+                <input id="hideIterat" type="number" value="0" min="0">
+            </div>
+        </div>
     </div>
     <div>
         <div class="weights">
@@ -85,159 +90,4 @@
     </div>
 </div>
 </body>
-
-<script>
-    var currentWeightsValues;
-    var counterIteration = 0;
-    var hideLayCount = 0;
-
-    var errorsStorage = [['Итерация', 'Значение ошибки'], [0,0]];
-
-
-    $("#init").click(function () {
-        $("#teach").attr("disabled", true);
-        $("#test").attr("disabled", true);
-        counterIteration = 0;
-        errorsStorage = [['Итерация', 'Значение ошибки']];
-
-        hideLayCount = $("#hideLayCount").val();
-
-        $.ajax({
-            url: "neuro.php",
-            type: 'POST',
-            dataType: 'json',
-            data: {do: 'init', hideLayCount: hideLayCount},
-            success: function (result) {
-                $("#errorsTable td").remove();
-                $("#errorsTable tbody tr").remove();
-                $(".answer pre").text("");
-
-                let er = result['error'];
-                console.log("Ошибка сети: " + er);
-
-                let weights = result['weights'];
-                currentWeightsValues = weights;
-
-                let weightsStr = arrayToStr(weights);
-                $("#weights").text("Текущее значение весов: \n\n" + weightsStr);
-
-                $("#errorsTable tbody").html("<tr><td>" + counterIteration + "</td><td>1</td><td>–</td><td>" + er + "</td></tr>");
-
-                errorsStorage.push([counterIteration, er]);
-                drawChart();
-
-                $("#teach").attr("disabled", false);
-                $("#test").attr("disabled", false);
-            }
-        });
-    });
-
-    function arrayToStr(arr) {
-        let blkstr = [];
-        $.each(arr, function (index, value) {
-            blkstr.push(index + ": " + value);
-        });
-        return blkstr.join("\n");
-    }
-
-    $("#teach").click(function () {
-        $("#teach").attr("disabled", true);
-        $("#test").attr("disabled", true);
-        counterIteration++;
-
-        let countEpochs = $("#countEpochs").val();
-        let teachKoef = $("#teachKoef").val();
-
-        // console.log(hideLayCount);
-        // console.log(currentWeightsValues);
-        $.ajax({
-            url: "neuro.php",
-            type: 'POST',
-            dataType: 'json',
-            data: {
-                do: 'teach',
-                weights: currentWeightsValues,
-                countEpochs: countEpochs,
-                teachKoef: teachKoef,
-                hideLayCount: hideLayCount
-            },
-            success: function (result) {
-                console.log(result);
-                let er = result['error'];
-                console.log("Ошибка сети: " + er);
-
-                let weights = result['weights'];
-                currentWeightsValues = weights;
-
-                let weightsStr = arrayToStr(result['weights']);
-                $("#weights").text("Текущее значение весов: \n\n" + weightsStr);
-
-                $("#errorsTable tbody tr:first").before("<tr><td>" + counterIteration + "</td><td>" + countEpochs + "</td><td>" + teachKoef + "</td><td>" + er + "</td></tr>");
-
-                errorsStorage.push([counterIteration, er]);
-                drawChart();
-
-                $("#teach").attr("disabled", false);
-                $("#test").attr("disabled", false);
-
-                if (er > 1 && !($("#stopTeach").is(':checked'))) {
-                    $("#teach").click();
-                } else {
-                    $("#stopTeach").prop('checked', false);
-                }
-            }
-        });
-    });
-
-    $("#test").click(function () {
-        $("#teach").attr("disabled", true);
-        $("#test").attr("disabled", true);
-
-        let in1 = $("#in1").val();
-        let in2 = $("#in2").val();
-        let in3 = $("#in3").val();
-        let in4 = $("#in4").val();
-
-        $.ajax({
-            url: "neuro.php",
-            type: 'POST',
-            dataType: 'json',
-            data: {
-                do: 'test',
-                weights: currentWeightsValues,
-                hideLayCount: hideLayCount,
-                in1: in1,
-                in2: in2,
-                in3: in3,
-                in4: in4
-            },
-            success: function (result) {
-                console.log(result['answer']);
-
-                $(".answer pre").text("Ответ сети: \n\n" + arrayToStr(result['answer']));
-                $("#teach").attr("disabled", false);
-                $("#test").attr("disabled", false);
-            }
-        });
-    });
-
-    // Load the Visualization API and the corechart package.
-    google.charts.load('current', {'packages': ['corechart']});
-
-    google.charts.setOnLoadCallback(drawChart);
-
-    function drawChart() {
-        var data = google.visualization.arrayToDataTable(errorsStorage);
-
-        var options = {
-            title: 'График ошибки',
-            curveType: 'function',
-            legend: {position: 'top'}
-        };
-
-        var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
-
-        chart.draw(data, options);
-    }
-</script>
 </html>
