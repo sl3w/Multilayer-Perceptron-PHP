@@ -3,12 +3,12 @@
 //define("COUNT_OUTPUTS", 3);
 define("FUNC_KOEF", 0.3);
 
-global $isTeach, $numPrimer, $teachKoef, $teachKoefStandart;
+global $isTeach, $numPrimer, $teachKoef, $teachKoefStandart, $momentsKoef;
 global $hideLayCount, $hideLayNeuronCount, $outLayNeuronCount;
 
 $isTeach = false;
 
-global $answers, $ethalons, $funcsAct, $dopWeights;
+global $answers, $ethalons, $funcsAct, $dopWeights, $weightsPast;
 
 //global $dopWeight;
 //$dopWeight = array();
@@ -56,12 +56,20 @@ if ($do == 'init') {
     $weights = $_POST['weights'];
     $dopWeights = $_POST['dopWeights'];
     $countEpochs = $_POST['countEpochs'];
+    $counterEpochs = $_POST['counterEpochs'];
     $teachKoef = $_POST['teachKoef'];
-    $teachKoefStandart = $_POST['teachKoef'];
+    $teachKoefStandart = $_POST['teachKoefStandart'];
+    $momentsKoef = $_POST['momentsKoef'];
+
+//    if ($counterEpochs == 0) {
+//        $weightsPast = $weights;
+//    } else {
+        $weightsPast = $_POST['weightsPast'];
+//    }
 
     for ($i = 0; $i < $countEpochs; $i++) {
         $numPrimer = 1;
-        goEpoch($weights);
+        goEpoch($weights, $i);
     }
 
     $isTeach = false;
@@ -77,6 +85,8 @@ if ($do == 'init') {
     $res['error'] = $er;
     $res['weights'] = $weights;
     $res['dopWeights'] = $dopWeights;
+    $res['weightsPast'] = $weightsPast;
+    $res['teachKoef'] = $teachKoef;
     echo json_encode($res);
 
 } elseif ($do == 'test') {
@@ -84,9 +94,6 @@ if ($do == 'init') {
     $dopWeights = $_POST['dopWeights'];
 
     $in1 = $_POST['in1'];
-//    $in2 = $_POST['in2'];
-//    $in3 = $_POST['in3'];
-//    $in4 = $_POST['in4'];
 
     $ans = startExample($weights, $in1);
 
@@ -97,8 +104,10 @@ if ($do == 'init') {
 
 function startExample(&$weights, $x, $eth = false)
 {
-    global $isTeach, $answers, $ethalons, $numPrimer, $hideLayCount;
+    global $isTeach, $answers, $ethalons, $numPrimer, $hideLayCount, $weightsPast, $momentsKoef;
     generateX($x);
+
+
     $yOut = firstForward($weights, count($x));
 
     $answers[] = $yOut;
@@ -117,7 +126,11 @@ function startExample(&$weights, $x, $eth = false)
     if ($isTeach) {
         calcBackPropErrors($ds, $weights);
 
-        $newWeights = weightCorrection($weights, $x, $ds);
+        $weightsPastTemp = $weights;
+
+        $newWeights = weightCorrection($weights, $x, $ds, $momentsKoef);
+
+        $weightsPast = $weightsPastTemp;
 
         $weights = $newWeights;
 
@@ -188,9 +201,9 @@ function calcBackPropErrors(&$ds, $weights)
     }
 }
 
-function weightCorrection($weights, $x, $ds)
+function weightCorrection($weights, $x, $ds, $momentsKoef)
 {
-    global $teachKoef, $hideLayCount, $hideLayNeuronCount, $outLayNeuronCount;
+    global $teachKoef, $hideLayCount, $hideLayNeuronCount, $outLayNeuronCount, $weightsPast;
     $newWeights = array();
 
     for ($i = 1; $i <= $hideLayCount + 1; $i++) {
@@ -203,9 +216,18 @@ function weightCorrection($weights, $x, $ds)
             for ($k = 1; $k <= $kMax; $k++) {
                 $newW = getValueFuncAct($i - 1, $k) * $multDsA;
 
-                $w = $weights["w" . $i . $j . $k];
+                $wKey = "w" . $i . $j . $k;
+                $w = $weights[$wKey];
 
-                $newWeights["w" . $i . $j . $k] = $w + $newW;
+                $newW += $w;
+
+                $momentsKoef *= 1.0;
+                if ($momentsKoef > 0) {
+//                    die();
+                    $newW +=  0.9 * ($w - $weightsPast[$wKey]);
+                }
+
+                $newWeights[$wKey] = $newW;
             }
         }
     }
@@ -266,7 +288,7 @@ function setValueFuncAct($i, $j, $value)
     $funcsAct["f" . $i . $j . "-" . $numPrimer] = $value;
 }
 
-function goEpoch(&$weights)
+function goEpoch(&$weights, $numEpochOnIter = false)
 {
     $fileName = 'iris.data';
 
@@ -317,14 +339,15 @@ function goEpoch(&$weights)
     }
     fclose($handle);
 
-    recalcTeachKoef();
+    if ($numEpochOnIter && $_POST['dynamicTeachKoef'])
+        recalcTeachKoef($numEpochOnIter);
 }
 
-function recalcTeachKoef() {
+function recalcTeachKoef($numEpochOnIter) {
     global $teachKoef, $teachKoefStandart;
 
-//    $counterEpochs = $_POST['counterEpochs'] + ;
-//    $teachKoef = $teachKoefStandart / (1 + )
+    $counterEpochs = $_POST['counterEpochs'] + $numEpochOnIter;
+    $teachKoef = $teachKoefStandart / (1 + $counterEpochs / $_POST['startedStopCountStandart']);
 }
 
 function pre($var, $die = false)

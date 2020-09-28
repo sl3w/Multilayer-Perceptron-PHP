@@ -1,15 +1,21 @@
 var currentWeightsValues;
+var pastWeightsValues;
 var currentDopWeightsValues;
 var counterIteration = 0;
 var counterEpochs = 0;
 var hideLayCount = 0;
 var hideLayNeuronCount = 0;
 var outLayNeuronCount = 0;
+var teachKoefStandart = 0;
+
+var startedStopCountStandart = 0;
 
 var errorsStorage = [['Итерация', 'Значение ошибки'], [0, 0]];
 
 $(function () {
     $("#init").click(function () {
+        startedStopCountStandart = +$("#maxCountEpochs").val();
+
         $("#teach").attr("disabled", true);
         $("#test").attr("disabled", true);
         counterIteration = 0;
@@ -19,6 +25,9 @@ $(function () {
         hideLayCount = $("#hideLayCount").val();
         hideLayNeuronCount = $("#hideLayNeuronCount").val();
         outLayNeuronCount = $("#outLayNeuronCount").val();
+        if (teachKoefStandart !== 0)
+            $("#teachKoef").val(teachKoefStandart);
+        teachKoefStandart = $("#teachKoef").val();
 
         $.ajax({
             url: "neuro.php",
@@ -40,6 +49,7 @@ $(function () {
                 let weights = result['weights'];
 
                 currentWeightsValues = weights;
+                pastWeightsValues = weights;
                 currentDopWeightsValues = result['dopWeights'];
 
                 console.log(result);
@@ -66,12 +76,15 @@ $(function () {
     }
 
     $("#teach").click(function () {
-        $("#teach").attr("disabled", true);
-        $("#test").attr("disabled", true);
+        toggleDisabled(true);
+
+
         counterIteration++;
 
-        let countEpochs = $("#countEpochs").val();
-        let teachKoef = $("#teachKoef").val();
+        let countEpochs = +$("#countEpochs").val();
+        let teachKoef = +$("#teachKoef").val();
+        let dynamicTeachKoef = ($("#dynamicTeachKoef").is(':checked')) ? 1 : 0;
+        let momentsKoef = ($("#stopTeach").is(':checked')) ? +$("#momentsKoef").val() : 0;
 
         $.ajax({
             url: "neuro.php",
@@ -83,10 +96,15 @@ $(function () {
                 dopWeights: currentDopWeightsValues,
                 countEpochs: countEpochs,
                 teachKoef: teachKoef,
+                teachKoefStandart: teachKoefStandart,
+                dynamicTeachKoef: dynamicTeachKoef,
                 hideLayCount: hideLayCount,
                 hideLayNeuronCount: hideLayNeuronCount,
                 outLayNeuronCount: outLayNeuronCount,
-                counterEpochs: counterEpochs
+                counterEpochs: counterEpochs,
+                weightsPast: pastWeightsValues,
+                momentsKoef: momentsKoef,
+                startedStopCountStandart: startedStopCountStandart
             },
             success: function (result) {
                 counterEpochs += +countEpochs;
@@ -97,8 +115,9 @@ $(function () {
 
                 let weights = result['weights'];
                 currentWeightsValues = weights;
+                pastWeightsValues = result['weightsPast'];
 
-                let weightsStr = arrayToStr(result['weights']);
+                let weightsStr = arrayToStr(weights);
                 $("#weights").text("Текущее значение весов: \n\n" + weightsStr);
 
                 $("#errorsTable tbody tr:first").before("<tr><td>" + counterIteration + "</td><td>" + counterEpochs + "</td><td>" + countEpochs + "</td><td>" + teachKoef + "</td><td>" + er + "</td></tr>");
@@ -106,8 +125,10 @@ $(function () {
                 errorsStorage.push([counterEpochs, er]);
                 drawChart();
 
-                $("#teach").attr("disabled", false);
-                $("#test").attr("disabled", false);
+                toggleDisabled(false);
+
+                $("#teachKoef").val(result['teachKoef']);
+
 
                 let maxEpochs = $("#maxCountEpochs").val();
                 let stopErrorParam = $("#stopErrorParam").val();
@@ -115,6 +136,7 @@ $(function () {
                 if (er > stopErrorParam && counterEpochs < maxEpochs && !($("#stopTeach").is(':checked'))) {
                     $("#teach").click();
                 } else {
+                    $("#maxCountEpochs").val(+$("#maxCountEpochs").val() + startedStopCountStandart);
                     //$("#stopTeach").prop('checked', false);
                 }
             }
@@ -185,4 +207,13 @@ $(function () {
     $("#hideIterat").on("change paste keyup", function () {
         drawChart();
     });
+
+    function toggleDisabled(toog) {
+        $("#init").attr("disabled", toog);
+        $("#teach").attr("disabled", toog);
+        $("#test").attr("disabled", toog);
+        $("#teachKoef").attr("disabled", toog);
+        $("#useMoments").attr("disabled", toog);
+        $("#momentsKoef").attr("disabled", toog);
+    }
 });

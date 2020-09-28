@@ -7,11 +7,12 @@ body {
 div {
     max-width: 100%;
     display: flex;
-    margin-right: 30px;
 }
 
 .buttons {
     flex-direction: column;
+    margin-right: 30px;
+    min-width: 200px;
 }
 
 .buttons button {
@@ -22,6 +23,7 @@ div {
 .errors {
     max-height: 350px;
     flex-direction: column;
+    margin-right: 30px;
     /*overflow-y: scroll;*/
 }
 
@@ -41,9 +43,13 @@ button.test {
     margin-bottom: 10px;
 }
 
-.answer, #curve_chart, .hideIterat, .line-chart, .stopParams {
-    margin-right: 0;
+.buttons input:not([type=checkbox]) {
+    margin: 5px 0;
 }
+
+/*.answer, #curve_chart, .hideIterat, .line-chart, .stopParams {*/
+/*    margin-right: 0;*/
+/*}*/
 
 .wrapper, .line-chart {
     flex-direction: column;
@@ -62,4 +68,9 @@ hr {
 
 .stopParams input:not(:last-child) {
     margin-right: 10px;
+}
+
+.moments {
+    margin-top: 10px;
+    margin-right: 0;
 }

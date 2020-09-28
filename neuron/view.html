@@ -15,7 +15,7 @@
 <script type="text/javascript" src="script.js"></script>
 
 <div class="wrapper">
-    <div>
+    <div style="margin-right: 30px">
         <div class="buttons">
             <label>Кол-во скрытых слоев:</label>
             <input id="hideLayCount" type="number" min="1" max="5" value="1">
@@ -31,17 +31,22 @@
             <input id="countEpochs" type="number" min="0" step="100" value="10" max="1000">
             <label>Коэффициент обучения:</label>
             <input id="teachKoef" type="number" min="0" max="1" step="0.01" value="0.1">
-
-            <div style="display: flex">
-                <input id="stopTeach" type="checkbox"><label for="stopTeach">Остановить</label>
+            <div class="dynamicTeachKoef">
+                <input id="dynamicTeachKoef" type="checkbox"><label for="dynamicTeachKoef">Изменять коэф. обучения</label>
             </div>
+            <div class="moments">
+                <input id="useMoments" type="checkbox"><label for="useMoments">Моменты</label>
+            </div>
+            <label>Коэффициент момента:</label>
+            <input id="momentsKoef" type="number" min="0" max="1" step="0.01" value="0.1">
+
             <button id="teach" disabled>
                 Обучение
             </button>
 
             <hr>
             <label>Тестовые данные:</label>
-            <input id="inputTest" type="text">
+            <input id="inputTest" type="text" value="6.0,2.2,4.0,1.0">
 
             <button id="test" class="test" disabled>
                 Тест
@@ -59,7 +64,10 @@
                 <label>Максимальное количество эпох:</label>
                 <input id="maxCountEpochs" type="number" min="0" step="100" value="1000" max="10000">
                 <label>Допустимое значение ошибки для выхода:</label>
-                <input id="stopErrorParam" type="number" min="0" value="3" max="1000">
+                <input id="stopErrorParam" type="number" min="0" value="4" max="1000">
+            </div>
+            <div style="display: flex; margin-top: 10px">
+                <input id="stopTeach" type="checkbox"><label for="stopTeach">Остановить принудительно</label>
             </div>
             <hr>
             <table id="errorsTable">
@@ -91,7 +99,7 @@
         </div>
 
         <div class="line-chart">
-            <div id="curve_chart" style="width: 800px; height: 500px"></div>
+            <div id="curve_chart" style="width: 730px; height: 500px"></div>
             <div class="hideIterat" style="max-height: max-content">
                 <label>Скрыть первые итерации на графике: </label>
                 <input id="hideIterat" type="number" value="0" min="0" step="10">
