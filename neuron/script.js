@@ -1,7 +1,10 @@
 var currentWeightsValues;
 var currentDopWeightsValues;
 var counterIteration = 0;
+var counterEpochs = 0;
 var hideLayCount = 0;
+var hideLayNeuronCount = 0;
+var outLayNeuronCount = 0;
 
 var errorsStorage = [['Итерация', 'Значение ошибки'], [0, 0]];
 
@@ -10,15 +13,23 @@ $(function () {
         $("#teach").attr("disabled", true);
         $("#test").attr("disabled", true);
         counterIteration = 0;
+        counterEpochs = 0;
         errorsStorage = [['Итерация', 'Значение ошибки']];
 
         hideLayCount = $("#hideLayCount").val();
+        hideLayNeuronCount = $("#hideLayNeuronCount").val();
+        outLayNeuronCount = $("#outLayNeuronCount").val();
 
         $.ajax({
             url: "neuro.php",
             type: 'POST',
             dataType: 'json',
-            data: {do: 'init', hideLayCount: hideLayCount},
+            data: {
+                do: 'init',
+                hideLayCount: hideLayCount,
+                hideLayNeuronCount: hideLayNeuronCount,
+                outLayNeuronCount: outLayNeuronCount
+            },
             success: function (result) {
                 $("#errorsTable td").remove();
                 $("#errorsTable tbody tr").remove();
@@ -35,7 +46,7 @@ $(function () {
                 let weightsStr = arrayToStr(weights);
                 $("#weights").text("Текущее значение весов: \n\n" + weightsStr);
 
-                $("#errorsTable tbody").html("<tr><td>" + counterIteration + "</td><td>1</td><td>–</td><td>" + er + "</td></tr>");
+                $("#errorsTable tbody").html("<tr><td>" + counterIteration + "</td><td>" + counterEpochs + "</td><td>1</td><td>–</td><td>" + er + "</td></tr>");
 
                 errorsStorage.push([counterIteration, er]);
                 drawChart();
@@ -72,12 +83,17 @@ $(function () {
                 dopWeights: currentDopWeightsValues,
                 countEpochs: countEpochs,
                 teachKoef: teachKoef,
-                hideLayCount: hideLayCount
+                hideLayCount: hideLayCount,
+                hideLayNeuronCount: hideLayNeuronCount,
+                outLayNeuronCount: outLayNeuronCount,
+                counterEpochs: counterEpochs
             },
             success: function (result) {
+                counterEpochs += +countEpochs;
+
                 console.log(result);
                 let er = result['error'];
-                console.log("Ошибка сети: " + er);
+                // console.log("Ошибка сети: " + er);
 
                 let weights = result['weights'];
                 currentWeightsValues = weights;
@@ -85,15 +101,18 @@ $(function () {
                 let weightsStr = arrayToStr(result['weights']);
                 $("#weights").text("Текущее значение весов: \n\n" + weightsStr);
 
-                $("#errorsTable tbody tr:first").before("<tr><td>" + counterIteration + "</td><td>" + countEpochs + "</td><td>" + teachKoef + "</td><td>" + er + "</td></tr>");
+                $("#errorsTable tbody tr:first").before("<tr><td>" + counterIteration + "</td><td>" + counterEpochs + "</td><td>" + countEpochs + "</td><td>" + teachKoef + "</td><td>" + er + "</td></tr>");
 
-                errorsStorage.push([counterIteration, er]);
+                errorsStorage.push([counterEpochs, er]);
                 drawChart();
 
                 $("#teach").attr("disabled", false);
                 $("#test").attr("disabled", false);
 
-                if (er > 1 && !($("#stopTeach").is(':checked'))) {
+                let maxEpochs = $("#maxCountEpochs").val();
+                let stopErrorParam = $("#stopErrorParam").val();
+
+                if (er > stopErrorParam && counterEpochs < maxEpochs && !($("#stopTeach").is(':checked'))) {
                     $("#teach").click();
                 } else {
                     //$("#stopTeach").prop('checked', false);
@@ -118,6 +137,8 @@ $(function () {
                 weights: currentWeightsValues,
                 dopWeights: currentDopWeightsValues,
                 hideLayCount: hideLayCount,
+                hideLayNeuronCount: hideLayNeuronCount,
+                outLayNeuronCount: outLayNeuronCount,
                 in1: inputAr,
             },
             success: function (result) {

@@ -1,9 +1,11 @@
 <?php
-define("COUNT_ON_SLOY", 4);
-define("COUNT_OUTPUTS", 3);
+//define("COUNT_ON_SLOY", 4);
+//define("COUNT_OUTPUTS", 3);
 define("FUNC_KOEF", 0.3);
 
-global $isTeach, $numPrimer, $teachKoef, $hideLayCount;
+global $isTeach, $numPrimer, $teachKoef, $teachKoefStandart;
+global $hideLayCount, $hideLayNeuronCount, $outLayNeuronCount;
+
 $isTeach = false;
 
 global $answers, $ethalons, $funcsAct, $dopWeights;
@@ -13,9 +15,11 @@ global $answers, $ethalons, $funcsAct, $dopWeights;
 
 //$teachTest = false;
 
-global $do;
+//global $do;
 $do = $_POST['do'];
 $hideLayCount = $_POST['hideLayCount'];
+$hideLayNeuronCount = $_POST['hideLayNeuronCount'];
+$outLayNeuronCount = $_POST['outLayNeuronCount'];
 
 //$weights = array(
 //    "w111" => 0.13,
@@ -53,6 +57,7 @@ if ($do == 'init') {
     $dopWeights = $_POST['dopWeights'];
     $countEpochs = $_POST['countEpochs'];
     $teachKoef = $_POST['teachKoef'];
+    $teachKoefStandart = $_POST['teachKoef'];
 
     for ($i = 0; $i < $countEpochs; $i++) {
         $numPrimer = 1;
@@ -130,12 +135,12 @@ function generateX($x)
 
 function firstForward(&$weights, $xCount)
 {
-    global $hideLayCount, $dopWeights;
+    global $hideLayCount, $hideLayNeuronCount, $outLayNeuronCount,  $dopWeights;
     for ($i = 1; $i <= $hideLayCount + 1; $i++) {
-        $jMax = $i == $hideLayCount + 1 ? COUNT_OUTPUTS : COUNT_ON_SLOY;
+        $jMax = $i == $hideLayCount + 1 ? $outLayNeuronCount : $hideLayNeuronCount;
         for ($j = 1; $j <= $jMax; $j++) {
 
-            $kMax = $i == 1 ? $xCount : COUNT_ON_SLOY;
+            $kMax = $i == 1 ? $xCount : $hideLayNeuronCount;
 
             $smtr = 0;
             for ($k = 1; $k <= $kMax; $k++) {
@@ -164,10 +169,10 @@ function firstForward(&$weights, $xCount)
 
 function calcBackPropErrors(&$ds, $weights)
 {
-    global $hideLayCount;
+    global $hideLayCount, $hideLayNeuronCount, $outLayNeuronCount;
     for ($i = $hideLayCount; $i > 0; $i--) {
-        for ($j = 1; $j <= COUNT_ON_SLOY; $j++) {
-            $kMax = $i == $hideLayCount ? COUNT_OUTPUTS : COUNT_ON_SLOY;
+        for ($j = 1; $j <= $hideLayNeuronCount; $j++) {
+            $kMax = $i == $hideLayCount ? $outLayNeuronCount : $hideLayNeuronCount;
 
             $curD = 0;
             for ($k = 1; $k <= $kMax; $k++) {
@@ -185,15 +190,15 @@ function calcBackPropErrors(&$ds, $weights)
 
 function weightCorrection($weights, $x, $ds)
 {
-    global $teachKoef, $hideLayCount;
+    global $teachKoef, $hideLayCount, $hideLayNeuronCount, $outLayNeuronCount;
     $newWeights = array();
 
     for ($i = 1; $i <= $hideLayCount + 1; $i++) {
-        $jMax = $i == $hideLayCount + 1 ? COUNT_OUTPUTS : COUNT_ON_SLOY;
+        $jMax = $i == $hideLayCount + 1 ? $outLayNeuronCount : $hideLayNeuronCount;
         for ($j = 1; $j <= $jMax; $j++) {
 
             $multDsA = $ds["d" . $i . $j] * $teachKoef * (-1);
-            $kMax = $i == 1 ? count($x) : COUNT_ON_SLOY;
+            $kMax = $i == 1 ? count($x) : $hideLayNeuronCount;
 
             for ($k = 1; $k <= $kMax; $k++) {
                 $newW = getValueFuncAct($i - 1, $k) * $multDsA;
@@ -311,6 +316,15 @@ function goEpoch(&$weights)
         startExample($weights, $xs, $eth);
     }
     fclose($handle);
+
+    recalcTeachKoef();
+}
+
+function recalcTeachKoef() {
+    global $teachKoef, $teachKoefStandart;
+
+//    $counterEpochs = $_POST['counterEpochs'] + ;
+//    $teachKoef = $teachKoefStandart / (1 + )
 }
 
 function pre($var, $die = false)

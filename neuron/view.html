@@ -19,23 +19,27 @@
         <div class="buttons">
             <label>Кол-во скрытых слоев:</label>
             <input id="hideLayCount" type="number" min="1" max="5" value="1">
+            <label>Кол-во нейронов на скрытом слое:</label>
+            <input id="hideLayNeuronCount" type="number" min="1" max="20" value="4">
+            <label>Кол-во нейронов на выходном слое:</label>
+            <input id="outLayNeuronCount" type="number" min="1" max="20" value="3">
             <button id="init">
                 Инициализация
             </button>
-
-            <label>Количество эпох на итерацию:</label>
-            <input id="countEpochs" type="number" min="0" step="100" value="100" max="1000">
-            <label>Коэф. обучения:</label>
+            <hr>
+            <label>Количество эпох за раз:</label>
+            <input id="countEpochs" type="number" min="0" step="100" value="10" max="1000">
+            <label>Коэффициент обучения:</label>
             <input id="teachKoef" type="number" min="0" max="1" step="0.01" value="0.1">
 
             <div style="display: flex">
-                <input id="stopTeach" type="checkbox" checked><label for="stopTeach">Остановить</label>
+                <input id="stopTeach" type="checkbox"><label for="stopTeach">Остановить</label>
             </div>
             <button id="teach" disabled>
                 Обучение
             </button>
 
-
+            <hr>
             <label>Тестовые данные:</label>
             <input id="inputTest" type="text">
 
@@ -46,9 +50,18 @@
             <div class="answer">
                 <pre></pre>
             </div>
+
+            <hr>
         </div>
 
         <div class="errors">
+            <div class="stopParams">
+                <label>Максимальное количество эпох:</label>
+                <input id="maxCountEpochs" type="number" min="0" step="100" value="1000" max="10000">
+                <label>Допустимое значение ошибки для выхода:</label>
+                <input id="stopErrorParam" type="number" min="0" value="3" max="1000">
+            </div>
+            <hr>
             <table id="errorsTable">
                 <thead>
                 <tr>
@@ -59,7 +72,10 @@
                         № итер.
                     </th>
                     <th>
-                        Кол-во эпох
+                        Общее кол-во эпох
+                    </th>
+                    <th>
+                        Кол-во эпох за раз
                     </th>
                     <th>
                         Коэф. обучения
@@ -78,7 +94,7 @@
             <div id="curve_chart" style="width: 800px; height: 500px"></div>
             <div class="hideIterat" style="max-height: max-content">
                 <label>Скрыть первые итерации на графике: </label>
-                <input id="hideIterat" type="number" value="0" min="0">
+                <input id="hideIterat" type="number" value="0" min="0" step="10">
             </div>
         </div>
     </div>

@@ -1,5 +1,7 @@
 body {
     display: flex;
+    font-family: monospace;
+    font-size: 14px;
 }
 
 div {
@@ -13,17 +15,23 @@ div {
 }
 
 .buttons button {
-    margin-bottom: 30px;
+    margin-top: 10px;
+    /*margin-bottom: 30px;*/
 }
 
 .errors {
     max-height: 350px;
-    overflow-y: scroll;
+    flex-direction: column;
+    /*overflow-y: scroll;*/
 }
 
-.errors table {
-    width: 700px;
+#errorsTable {
+    width: 500px;
 }
+
+/*.errors table {*/
+/*    width: 700px;*/
+/*}*/
 
 .errors td {
     text-align: center;
@@ -33,7 +41,7 @@ button.test {
     margin-bottom: 10px;
 }
 
-.answer, #curve_chart, .hideIterat {
+.answer, #curve_chart, .hideIterat, .line-chart, .stopParams {
     margin-right: 0;
 }
 
@@ -45,4 +53,13 @@ button.test {
     max-width: 50px;
     text-align: center;
     margin-left: 10px;
+}
+
+hr {
+    width: 100%;
+    margin: 10px 0;
+}
+
+.stopParams input:not(:last-child) {
+    margin-right: 10px;
 }
