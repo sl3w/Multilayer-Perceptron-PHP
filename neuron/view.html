@@ -51,11 +51,14 @@
             <button id="test" class="test" disabled>
                 Тест
             </button>
+            <div class="answer">
+                <pre></pre>
+            </div>
+
             <button id="testing" class="test" disabled>
                 Тест %
             </button>
-
-            <div class="answer">
+            <div class="answer2">
                 <pre></pre>
             </div>
 
@@ -67,7 +70,7 @@
                 <label>Максимальное количество эпох:</label>
                 <input id="maxCountEpochs" type="number" min="0" step="100" value="1000" max="10000">
                 <label>Допустимое значение ошибки для выхода:</label>
-                <input id="stopErrorParam" type="number" min="0" value="4" max="1000">
+                <input id="stopErrorParam" type="number" min="0" value="0.02" max="1000" step="0.1">
             </div>
             <div style="display: flex; margin-top: 10px">
                 <input id="stopTeach" type="checkbox"><label for="stopTeach">Остановить принудительно</label>
@@ -92,7 +95,7 @@
                         Коэф. обучения
                     </th>
                     <th>
-                        Значение ошибки
+                        СКО
                     </th>
                 </tr>
                 </thead>

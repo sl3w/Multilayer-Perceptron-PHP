@@ -102,6 +102,8 @@ if ($do == 'init') {
 
     $res['in'] = $in1;
     $res['answer'] = $ans;
+    $res['widths'] = $weights;
+    $res['dopWidth'] = $dopWeights;
     echo json_encode($res);
 } elseif ($do == 'testing') {
     $weights = $_POST['weights'];
@@ -125,6 +127,7 @@ if ($do == 'init') {
             $countRight++;
     }
     $res['answer'] = $countRight / count($_POST['testData']);
+    $res['answerText'] = $countRight . " из " . count($_POST['testData']);
     echo json_encode($res);
 }
 
@@ -250,7 +253,7 @@ function weightCorrection($weights, $x, $ds, $momentsKoef)
                 $momentsKoef *= 1.0;
                 if ($momentsKoef > 0) {
 //                    die();
-                    $newW += 0.9 * ($w - $weightsPast[$wKey]);
+                    $newW += $momentsKoef * ($w - $weightsPast[$wKey]);
                 }
 
                 $newWeights[$wKey] = $newW;
@@ -299,7 +302,7 @@ function calcNetworkError($answers, $ethalons)
             $sum += pow($answer - $ethalonVector[$l], 2);
         }
     }
-    return $sum / 2;
+    return sqrt($sum / (count($answers) - 1));
 }
 
 function getValueFuncAct($i, $j)
@@ -317,7 +320,7 @@ function setValueFuncAct($i, $j, $value)
 function goEpoch(&$weights, $numEpochOnIter = false)
 {
     if ($numEpochOnIter == -1) {
-        $fileName = 'iris.data';
+        $fileName = 'tic-tac-toe.data';
 
         $inputData = array();
 
@@ -356,6 +359,61 @@ function goEpoch(&$weights, $numEpochOnIter = false)
                 }
 
                 $xs = array_slice($exam, 0, count($exam) - 1);
+            } elseif ($fileName == 'bupa.data') {
+                $et = $exam[count($exam) - 1];
+                switch ($et) {
+                    case "1":
+                        $eth = array(1, 0);
+                        break;
+                    case "2":
+                        $eth = array(0, 1);
+                        break;
+                }
+
+                $xs = array_slice($exam, 0, count($exam) - 1);
+            } elseif ($fileName == 'dermatology.data') {
+                $et = $exam[count($exam) - 1];
+
+                $eth = array(0, 0, 0, 0, 0, 0);
+                $eth[$et] = 1;
+
+                $xs = array_slice($exam, 0, count($exam) - 1);
+            } elseif ($fileName == 'glass.data') {
+                $et = $exam[count($exam) - 1];
+
+                $eth = array(0, 0, 0, 0, 0, 0, 0);
+                $eth[$et] = 1;
+
+                $xs = array_slice($exam, 0, count($exam) - 1);
+            } elseif ($fileName == 'soybean-small.data') {
+                $et = $exam[count($exam) - 1];
+                switch ($et) {
+                    case "D1":
+                        $eth = array(1, 0, 0, 0);
+                        break;
+                    case "D2":
+                        $eth = array(0, 1, 0, 0);
+                        break;
+                    case "D3":
+                        $eth = array(0, 0, 1, 0);
+                        break;
+                    case "D4":
+                        $eth = array(0, 0, 0, 1);
+                        break;
+                }
+
+                $xs = array_slice($exam, 0, count($exam) - 1);
+            } elseif ($fileName == 'tic-tac-toe.data') {
+                $et = $exam[count($exam) - 1];
+                switch ($et) {
+                    case "1":
+                        $eth = array(1, 0);
+                        break;
+                    case "2":
+                        $eth = array(0, 1);
+                        break;
+                }
+                $xs = array_slice($exam, 0, count($exam) - 1);
             }
 
 //            startExample($weights, $xs, $eth);
@@ -365,7 +423,7 @@ function goEpoch(&$weights, $numEpochOnIter = false)
         fclose($handle);
 //        return $inputData;
         shuffle($inputData);
-        $count = round(0.7 * count($inputData));
+        $count = round(0.8 * count($inputData));
         global $testData;
         $testData = array_slice($inputData, $count);
         $inputData = array_slice($inputData, 0, $count);

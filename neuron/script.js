@@ -118,7 +118,7 @@ $(function () {
             success: function (result) {
                 counterEpochs += +countEpochs;
 
-                console.log(result);
+                // console.log(result);
                 let er = result['error'];
                 // console.log("Ошибка сети: " + er);
 
@@ -136,7 +136,8 @@ $(function () {
 
                 toggleDisabled(false);
 
-                $("#teachKoef").val(result['teachKoef']);
+                if (dynamicTeachKoef === 1)
+                    $("#teachKoef").val(result['teachKoef']);
 
 
                 let maxEpochs = $("#maxCountEpochs").val();
@@ -186,8 +187,8 @@ $(function () {
     });
 
     $("#testing").click(function () {
-        let inputTest = $("#inputTest").val();
-        let inputAr = inputTest.split(',');
+        // let inputTest = $("#inputTest").val();
+        // let inputAr = inputTest.split(',');
 
         $("#teach").attr("disabled", true);
         $("#test").attr("disabled", true);
@@ -207,9 +208,9 @@ $(function () {
                 testData: testData,
             },
             success: function (result) {
-                console.log(result);
+                // console.log(result);
 
-                // $(".answer pre").text("Ответ сети: \n\n" + arrayToStr(result['answer']));
+                $(".answer2 pre").text("Процент правильных ответов: \n\n" + (result['answer'] * 100) + "\n\n" + result['answerText']);
                 $("#teach").attr("disabled", false);
                 $("#test").attr("disabled", false);
                 $("#testing").attr("disabled", false);
@@ -257,7 +258,7 @@ $(function () {
         $("#teach").attr("disabled", toog);
         $("#test").attr("disabled", toog);
         $("#testing").attr("disabled", toog);
-        $("#teachKoef").attr("disabled", toog);
+        // $("#teachKoef").attr("disabled", toog);
         $("#useMoments").attr("disabled", toog);
         $("#momentsKoef").attr("disabled", toog);
     }
