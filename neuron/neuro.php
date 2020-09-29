@@ -16,11 +16,17 @@ global $answers, $ethalons, $funcsAct, $dopWeights, $weightsPast;
 
 //$teachTest = false;
 
-//global $do;
+global $do;
 $do = $_POST['do'];
 $hideLayCount = $_POST['hideLayCount'];
 $hideLayNeuronCount = $_POST['hideLayNeuronCount'];
 $outLayNeuronCount = $_POST['outLayNeuronCount'];
+
+//$res['do'] = $do1;
+//$res['hlc'] = $hideLayCount;
+//$res['hlnc'] = $hideLayNeuronCount;
+//$res['olnc'] = $outLayNeuronCount;
+//echo json_encode($res);
 
 //$weights = array(
 //    "w111" => 0.13,
@@ -90,6 +96,7 @@ if ($do == 'init') {
     $res['dopWeights'] = $dopWeights;
     $res['weightsPast'] = $weightsPast;
     $res['teachKoef'] = $teachKoef;
+    $res['momentsKoef'] = $momentsKoef;
     echo json_encode($res);
 
 } elseif ($do == 'test') {
@@ -155,11 +162,11 @@ function startExample(&$weights, $x, $eth = false)
     if ($isTeach) {
         calcBackPropErrors($ds, $weights);
 
-        $weightsPastTemp = $weights;
+//        $weightsPastTemp = $weights;
 
         $newWeights = weightCorrection($weights, $x, $ds, $momentsKoef);
 
-        $weightsPast = $weightsPastTemp;
+//        $weightsPast = $weightsPastTemp;
 
         $weights = $newWeights;
 
@@ -197,7 +204,7 @@ function firstForward(&$weights, $xCount)
             if (!key_exists($j, $dopWeights[$i])) {
                 $dopWeights[$i][$j] = getRandWeight();
             }
-            //$smtr += $dopWeights[$i][$j];
+            $smtr += $dopWeights[$i][$j];
 
             setValueFuncAct($i, $j, calcFuncActivation($smtr));
 
@@ -250,11 +257,11 @@ function weightCorrection($weights, $x, $ds, $momentsKoef)
 
                 $newW += $w;
 
-                $momentsKoef *= 1.0;
-                if ($momentsKoef > 0) {
-//                    die();
-                    $newW += $momentsKoef * ($w - $weightsPast[$wKey]);
-                }
+//                $momentsKoef *= 1.0;
+//                if ($momentsKoef > 0) {
+////                    die();
+//                    $newW += $momentsKoef * ($w - $weightsPast[$wKey]);
+//                }
 
                 $newWeights[$wKey] = $newW;
             }
@@ -302,7 +309,14 @@ function calcNetworkError($answers, $ethalons)
             $sum += pow($answer - $ethalonVector[$l], 2);
         }
     }
-    return sqrt($sum / (count($answers) - 1));
+//    global $do, $momentsKoef;
+//    if ($do != 'init')
+//        $sko = sqrt($sum / (count($answers) - 1)) * $_POST['startedStopCountStandart'] / ($_POST['counterEpochs'] + $_POST['startedStopCountStandart']);
+//    else
+    $sko = sqrt($sum / (count($answers) - 1));
+//    if ($momentsKoef > 0)
+//        $sko *= 0.7;
+    return $sko;
 }
 
 function getValueFuncAct($i, $j)
@@ -320,14 +334,14 @@ function setValueFuncAct($i, $j, $value)
 function goEpoch(&$weights, $numEpochOnIter = false)
 {
     if ($numEpochOnIter == -1) {
-        $fileName = 'tic-tac-toe.data';
+        $fileName = 'zoo.data';
 
         $inputData = array();
 
         $handle = fopen($fileName, "r");
 
         while (!feof($handle)) {
-            $buffer = fgets($handle, 4096);
+            $buffer = fgets($handle, 300);
             $exam = explode(",", trim($buffer));
 
             if ($fileName == 'balance.data') {
@@ -341,6 +355,17 @@ function goEpoch(&$weights, $numEpochOnIter = false)
                         break;
                     case "B":
                         $eth = array(0, 1, 0);
+                        break;
+                }
+                $xs = array_slice($exam, 1);
+            } elseif ($fileName == 'balance2.data') {
+                $et = $exam[0];
+                switch ($et) {
+                    case "R":
+                        $eth = array(0, 1);
+                        break;
+                    case "L":
+                        $eth = array(1, 0);
                         break;
                 }
                 $xs = array_slice($exam, 1);
@@ -375,16 +400,22 @@ function goEpoch(&$weights, $numEpochOnIter = false)
                 $et = $exam[count($exam) - 1];
 
                 $eth = array(0, 0, 0, 0, 0, 0);
-                $eth[$et] = 1;
+                $eth[$et - 1] = 1;
 
                 $xs = array_slice($exam, 0, count($exam) - 1);
-            } elseif ($fileName == 'glass.data') {
+            } elseif ($fileName == 'myglass.data') {
                 $et = $exam[count($exam) - 1];
 
-                $eth = array(0, 0, 0, 0, 0, 0, 0);
-                $eth[$et] = 1;
+//                if ($et >= 4)
+//                    continue;
+                if ($et == 1 || $et == 3)
+                    $eth = array(1, 0);
+                else
+                    $eth = array(0, 1);
+//                $eth = array(0, 0, 0, 0, 0, 0, 0);
+//                $eth[$et - 1] = 1;
 
-                $xs = array_slice($exam, 0, count($exam) - 1);
+                $xs = array_slice($exam, 1, count($exam) - 2);
             } elseif ($fileName == 'soybean-small.data') {
                 $et = $exam[count($exam) - 1];
                 switch ($et) {
@@ -414,16 +445,74 @@ function goEpoch(&$weights, $numEpochOnIter = false)
                         break;
                 }
                 $xs = array_slice($exam, 0, count($exam) - 1);
+            } elseif ($fileName == 'tae.data') {
+                $et = $exam[count($exam) - 1];
+                switch ($et) {
+                    case "1":
+                        $eth = array(1, 0, 0);
+                        break;
+                    case "2":
+                        $eth = array(0, 1, 0);
+                        break;
+                    case "3":
+                        $eth = array(0, 0, 1);
+                        break;
+                }
+                $xs = array_slice($exam, 0, count($exam) - 1);
+            } elseif ($fileName == 'winequality-red.csv') {
+                $et = $exam[count($exam) - 1];
+                switch ($et) {
+                    case "5":
+                        $eth = array(1, 0, 0, 0);
+                        break;
+                    case "6":
+                        $eth = array(0, 1, 0, 0);
+                        break;
+                    case "7":
+                        $eth = array(0, 0, 1, 0);
+                        break;
+                    case "8":
+                        $eth = array(0, 0, 0, 1);
+                        break;
+                }
+                $xs = array_slice($exam, 0, count($exam) - 1);
+            }elseif ($fileName == 'nursery.data') {
+                $et = $exam[count($exam) - 1];
+                $eth = false;
+                switch ($et) {
+                    case "12":
+                    case "15":
+//                        $eth = array(1, 0, 0, 0);
+//                        continue;
+                        break;
+                    case "11":
+                        $eth = array(0, 1, 0);
+                        break;
+                    case "13":
+                        $eth = array(0, 0, 1);
+                        break;
+                    case "22":
+                        $eth = array(1, 0, 0);
+                        break;
+                }
+                $xs = array_slice($exam, 0, count($exam) - 1);
+            } elseif ($fileName == 'zoo.data') {
+                $et = $exam[count($exam) - 1];
+                $eth = array(0,0,0,0,0,0,0);
+                $eth[$et - 1] = 1;
+
+                $xs = array_slice($exam, 1, count($exam) - 2);
             }
 
 //            startExample($weights, $xs, $eth);
 
-            $inputData[] = array($xs, $eth);
+            if ($eth)
+                $inputData[] = array($xs, $eth);
         }
         fclose($handle);
 //        return $inputData;
         shuffle($inputData);
-        $count = round(0.8 * count($inputData));
+        $count = round(0.7 * count($inputData));
         global $testData;
         $testData = array_slice($inputData, $count);
         $inputData = array_slice($inputData, 0, $count);

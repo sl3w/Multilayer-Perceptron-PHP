@@ -56,8 +56,8 @@ $(function () {
                 currentDopWeightsValues = result['dopWeights'];
                 inputData = result['inputData'];
                 testData = result['testData'];
-                console.log(inputData);
-                console.log(testData);
+                // console.log(inputData.length);
+                // console.log(testData.length);
 
                 console.log(result);
                 let weightsStr = arrayToStr(weights);
@@ -92,8 +92,9 @@ $(function () {
         let countEpochs = +$("#countEpochs").val();
         let teachKoef = +$("#teachKoef").val();
         let dynamicTeachKoef = ($("#dynamicTeachKoef").is(':checked')) ? 1 : 0;
-        let momentsKoef = ($("#stopTeach").is(':checked')) ? +$("#momentsKoef").val() : 0;
+        let momentsKoef = ($("#useMoments").is(':checked')) ? +$("#momentsKoef").val() : 0;
 
+        // console.log(momentsKoef);
         $.ajax({
             url: "neuro.php",
             type: 'POST',
@@ -118,7 +119,7 @@ $(function () {
             success: function (result) {
                 counterEpochs += +countEpochs;
 
-                // console.log(result);
+                console.log(result);
                 let er = result['error'];
                 // console.log("Ошибка сети: " + er);
 
