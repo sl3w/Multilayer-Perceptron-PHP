@@ -7,6 +7,8 @@ var hideLayCount = 0;
 var hideLayNeuronCount = 0;
 var outLayNeuronCount = 0;
 var teachKoefStandart = 0;
+var inputData;
+var testData;
 
 var startedStopCountStandart = 0;
 
@@ -18,6 +20,7 @@ $(function () {
 
         $("#teach").attr("disabled", true);
         $("#test").attr("disabled", true);
+        $("#testing").attr("disabled", true);
         counterIteration = 0;
         counterEpochs = 0;
         errorsStorage = [['Итерация', 'Значение ошибки']];
@@ -51,6 +54,10 @@ $(function () {
                 currentWeightsValues = weights;
                 pastWeightsValues = weights;
                 currentDopWeightsValues = result['dopWeights'];
+                inputData = result['inputData'];
+                testData = result['testData'];
+                console.log(inputData);
+                console.log(testData);
 
                 console.log(result);
                 let weightsStr = arrayToStr(weights);
@@ -63,6 +70,7 @@ $(function () {
 
                 $("#teach").attr("disabled", false);
                 $("#test").attr("disabled", false);
+                $("#testing").attr("disabled", false);
             }
         });
     });
@@ -104,7 +112,8 @@ $(function () {
                 counterEpochs: counterEpochs,
                 weightsPast: pastWeightsValues,
                 momentsKoef: momentsKoef,
-                startedStopCountStandart: startedStopCountStandart
+                startedStopCountStandart: startedStopCountStandart,
+                inputData: inputData,
             },
             success: function (result) {
                 counterEpochs += +countEpochs;
@@ -136,7 +145,8 @@ $(function () {
                 if (er > stopErrorParam && counterEpochs < maxEpochs && !($("#stopTeach").is(':checked'))) {
                     $("#teach").click();
                 } else {
-                    $("#maxCountEpochs").val(+$("#maxCountEpochs").val() + startedStopCountStandart);
+                    if (countEpochs > maxEpochs)
+                        $("#maxCountEpochs").val(+$("#maxCountEpochs").val() + startedStopCountStandart);
                     //$("#stopTeach").prop('checked', false);
                 }
             }
@@ -149,6 +159,7 @@ $(function () {
 
         $("#teach").attr("disabled", true);
         $("#test").attr("disabled", true);
+        $("#testing").attr("disabled", true);
 
         $.ajax({
             url: "neuro.php",
@@ -169,6 +180,39 @@ $(function () {
                 $(".answer pre").text("Ответ сети: \n\n" + arrayToStr(result['answer']));
                 $("#teach").attr("disabled", false);
                 $("#test").attr("disabled", false);
+                $("#testing").attr("disabled", false);
+            }
+        });
+    });
+
+    $("#testing").click(function () {
+        let inputTest = $("#inputTest").val();
+        let inputAr = inputTest.split(',');
+
+        $("#teach").attr("disabled", true);
+        $("#test").attr("disabled", true);
+        $("#testing").attr("disabled", true);
+
+        $.ajax({
+            url: "neuro.php",
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                do: 'testing',
+                weights: currentWeightsValues,
+                dopWeights: currentDopWeightsValues,
+                hideLayCount: hideLayCount,
+                hideLayNeuronCount: hideLayNeuronCount,
+                outLayNeuronCount: outLayNeuronCount,
+                testData: testData,
+            },
+            success: function (result) {
+                console.log(result);
+
+                // $(".answer pre").text("Ответ сети: \n\n" + arrayToStr(result['answer']));
+                $("#teach").attr("disabled", false);
+                $("#test").attr("disabled", false);
+                $("#testing").attr("disabled", false);
             }
         });
     });
@@ -212,6 +256,7 @@ $(function () {
         $("#init").attr("disabled", toog);
         $("#teach").attr("disabled", toog);
         $("#test").attr("disabled", toog);
+        $("#testing").attr("disabled", toog);
         $("#teachKoef").attr("disabled", toog);
         $("#useMoments").attr("disabled", toog);
         $("#momentsKoef").attr("disabled", toog);

@@ -5,6 +5,7 @@ define("FUNC_KOEF", 0.3);
 
 global $isTeach, $numPrimer, $teachKoef, $teachKoefStandart, $momentsKoef;
 global $hideLayCount, $hideLayNeuronCount, $outLayNeuronCount;
+global $testData;
 
 $isTeach = false;
 
@@ -40,13 +41,15 @@ $outLayNeuronCount = $_POST['outLayNeuronCount'];
 //$do = 'init';
 if ($do == 'init') {
     $numPrimer = 1;
-    goEpoch($weights);
+    $inputData = goEpoch($weights, -1);
 
     $er = calcNetworkError($answers, $ethalons);
 
     $res['error'] = $er;
     $res['weights'] = $weights;
     $res['dopWeights'] = $dopWeights;
+    $res['inputData'] = $inputData;
+    $res['testData'] = $testData;
     //$res['fs'] = $funcsAct;
     echo json_encode($res);
 
@@ -64,7 +67,7 @@ if ($do == 'init') {
 //    if ($counterEpochs == 0) {
 //        $weightsPast = $weights;
 //    } else {
-        $weightsPast = $_POST['weightsPast'];
+    $weightsPast = $_POST['weightsPast'];
 //    }
 
     for ($i = 0; $i < $countEpochs; $i++) {
@@ -99,6 +102,29 @@ if ($do == 'init') {
 
     $res['in'] = $in1;
     $res['answer'] = $ans;
+    echo json_encode($res);
+} elseif ($do == 'testing') {
+    $weights = $_POST['weights'];
+    $dopWeights = $_POST['dopWeights'];
+
+    $testData = $_POST['testData'];
+    $countRight = 0;
+    foreach ($testData as $testDat) {
+        $ans = startExample($weights, $testDat[0]);
+
+        $ansMaxInd = 0;
+        $ansMax = $ans[0];
+        for ($i = 1; $i < count($ans); $i++) {
+            if ($ans[$i] > $ansMax) {
+                $ansMax = $ans[$i];
+                $ansMaxInd = $i;
+            }
+        }
+
+        if ($testDat[1][$ansMaxInd] == 1)
+            $countRight++;
+    }
+    $res['answer'] = $countRight / count($_POST['testData']);
     echo json_encode($res);
 }
 
@@ -148,7 +174,7 @@ function generateX($x)
 
 function firstForward(&$weights, $xCount)
 {
-    global $hideLayCount, $hideLayNeuronCount, $outLayNeuronCount,  $dopWeights;
+    global $hideLayCount, $hideLayNeuronCount, $outLayNeuronCount, $dopWeights;
     for ($i = 1; $i <= $hideLayCount + 1; $i++) {
         $jMax = $i == $hideLayCount + 1 ? $outLayNeuronCount : $hideLayNeuronCount;
         for ($j = 1; $j <= $jMax; $j++) {
@@ -224,7 +250,7 @@ function weightCorrection($weights, $x, $ds, $momentsKoef)
                 $momentsKoef *= 1.0;
                 if ($momentsKoef > 0) {
 //                    die();
-                    $newW +=  0.9 * ($w - $weightsPast[$wKey]);
+                    $newW += 0.9 * ($w - $weightsPast[$wKey]);
                 }
 
                 $newWeights[$wKey] = $newW;
@@ -290,60 +316,73 @@ function setValueFuncAct($i, $j, $value)
 
 function goEpoch(&$weights, $numEpochOnIter = false)
 {
-    $fileName = 'iris.data';
+    if ($numEpochOnIter == -1) {
+        $fileName = 'iris.data';
 
-    $handle = fopen($fileName, "r");
-    while (!feof($handle)) {
-        $buffer = fgets($handle, 4096);
-        $exam = explode(",", trim($buffer));
+        $inputData = array();
 
+        $handle = fopen($fileName, "r");
 
-//        $eth = array(0,0,0,0,0,0,0);
-//        if($et == 0 || $et == 1)
-//            continue;
-//        $eth[$et] = 1;
+        while (!feof($handle)) {
+            $buffer = fgets($handle, 4096);
+            $exam = explode(",", trim($buffer));
 
+            if ($fileName == 'balance.data') {
+                $et = $exam[0];
+                switch ($et) {
+                    case "R":
+                        $eth = array(0, 0, 1);
+                        break;
+                    case "L":
+                        $eth = array(1, 0, 0);
+                        break;
+                    case "B":
+                        $eth = array(0, 1, 0);
+                        break;
+                }
+                $xs = array_slice($exam, 1);
+            } elseif ($fileName == 'iris.data') {
+                $et = $exam[count($exam) - 1];
+                switch ($et) {
+                    case "Iris-setosa":
+                        $eth = array(1, 0, 0);
+                        break;
+                    case "Iris-versicolor":
+                        $eth = array(0, 1, 0);
+                        break;
+                    case "Iris-virginica":
+                        $eth = array(0, 0, 1);
+                        break;
+                }
 
-        if ($fileName == 'balance.data') {
-            $et = $exam[0];
-            switch ($et) {
-                case "R":
-                    $eth = array(0, 0, 1);
-                    break;
-                case "L":
-                    $eth = array(1, 0, 0);
-                    break;
-                case "B":
-                    $eth = array(0, 1, 0);
-                    break;
+                $xs = array_slice($exam, 0, count($exam) - 1);
             }
-            $xs = array_slice($exam, 1);
-        } elseif ($fileName == 'iris.data') {
-            $et = $exam[count($exam) - 1];
-            switch ($et) {
-                case "Iris-setosa":
-                    $eth = array(1, 0, 0);
-                    break;
-                case "Iris-versicolor":
-                    $eth = array(0, 1, 0);
-                    break;
-                case "Iris-virginica":
-                    $eth = array(0, 0, 1);
-                    break;
-            }
 
-            $xs = array_slice($exam, 0, count($exam) - 1);
+//            startExample($weights, $xs, $eth);
+
+            $inputData[] = array($xs, $eth);
         }
-
-        startExample($weights, $xs, $eth);
+        fclose($handle);
+//        return $inputData;
+        shuffle($inputData);
+        $count = round(0.7 * count($inputData));
+        global $testData;
+        $testData = array_slice($inputData, $count);
+        $inputData = array_slice($inputData, 0, $count);
+    } else
+        $inputData = $_POST['inputData'];
+    foreach ($inputData as $i => $example) {
+        startExample($weights, $example[0], $example[1]);
     }
-    fclose($handle);
 
-    if ($numEpochOnIter && $_POST['dynamicTeachKoef'])
+    if ($numEpochOnIter > 0 && $_POST['dynamicTeachKoef'])
         recalcTeachKoef($numEpochOnIter);
+
+    return $inputData;
 }
 
-function recalcTeachKoef($numEpochOnIter) {
+function recalcTeachKoef($numEpochOnIter)
+{
     global $teachKoef, $teachKoefStandart;
 
     $counterEpochs = $_POST['counterEpochs'] + $numEpochOnIter;
