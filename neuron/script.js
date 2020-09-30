@@ -190,7 +190,7 @@ $(function () {
     $("#testing").click(function () {
         // let inputTest = $("#inputTest").val();
         // let inputAr = inputTest.split(',');
-
+        $(".answer2 pre").text("");
         $("#teach").attr("disabled", true);
         $("#test").attr("disabled", true);
         $("#testing").attr("disabled", true);

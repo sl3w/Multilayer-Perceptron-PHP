@@ -334,14 +334,14 @@ function setValueFuncAct($i, $j, $value)
 function goEpoch(&$weights, $numEpochOnIter = false)
 {
     if ($numEpochOnIter == -1) {
-        $fileName = 'zoo.data';
+        $fileName = 'tic-tac-toe.data';
 
         $inputData = array();
 
         $handle = fopen($fileName, "r");
 
         while (!feof($handle)) {
-            $buffer = fgets($handle, 300);
+            $buffer = fgets($handle, 1000);
             $exam = explode(",", trim($buffer));
 
             if ($fileName == 'balance.data') {
@@ -385,6 +385,7 @@ function goEpoch(&$weights, $numEpochOnIter = false)
 
                 $xs = array_slice($exam, 0, count($exam) - 1);
             } elseif ($fileName == 'bupa.data') {
+                //6 входов
                 $et = $exam[count($exam) - 1];
                 switch ($et) {
                     case "1":
@@ -397,23 +398,25 @@ function goEpoch(&$weights, $numEpochOnIter = false)
 
                 $xs = array_slice($exam, 0, count($exam) - 1);
             } elseif ($fileName == 'dermatology.data') {
+                //34 входа, 6 выходов
                 $et = $exam[count($exam) - 1];
 
                 $eth = array(0, 0, 0, 0, 0, 0);
                 $eth[$et - 1] = 1;
 
                 $xs = array_slice($exam, 0, count($exam) - 1);
-            } elseif ($fileName == 'myglass.data') {
+            } elseif ($fileName == 'glass.data') {
+                //9 входов
                 $et = $exam[count($exam) - 1];
-
+                $eth = false;
 //                if ($et >= 4)
 //                    continue;
-                if ($et == 1 || $et == 3)
-                    $eth = array(1, 0);
-                else
-                    $eth = array(0, 1);
-//                $eth = array(0, 0, 0, 0, 0, 0, 0);
-//                $eth[$et - 1] = 1;
+//                if ($et == 1 || $et == 3)
+//                    $eth = array(1, 0);
+//                elseif ($et == 2)
+//                    $eth = array(0, 1);
+                $eth = array(0, 0, 0, 0, 0, 0, 0);
+                $eth[$et - 1] = 1;
 
                 $xs = array_slice($exam, 1, count($exam) - 2);
             } elseif ($fileName == 'soybean-small.data') {
@@ -435,6 +438,7 @@ function goEpoch(&$weights, $numEpochOnIter = false)
 
                 $xs = array_slice($exam, 0, count($exam) - 1);
             } elseif ($fileName == 'tic-tac-toe.data') {
+                //9 входов
                 $et = $exam[count($exam) - 1];
                 switch ($et) {
                     case "1":
@@ -499,6 +503,12 @@ function goEpoch(&$weights, $numEpochOnIter = false)
             } elseif ($fileName == 'zoo.data') {
                 $et = $exam[count($exam) - 1];
                 $eth = array(0,0,0,0,0,0,0);
+                $eth[$et - 1] = 1;
+
+                $xs = array_slice($exam, 1, count($exam) - 2);
+            } elseif ($fileName == 'poker-hand-training-true.data') {
+                $et = $exam[count($exam) - 1];
+                $eth = array(0,0,0,0,0,0,0,0,0);
                 $eth[$et - 1] = 1;
 
                 $xs = array_slice($exam, 1, count($exam) - 2);
