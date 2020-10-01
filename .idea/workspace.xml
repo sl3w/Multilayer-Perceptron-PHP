@@ -55,7 +55,7 @@
     <property name="WebServerToolWindowPanel.toolwindow.show.date" value="false" />
     <property name="WebServerToolWindowPanel.toolwindow.show.permissions" value="false" />
     <property name="WebServerToolWindowPanel.toolwindow.show.size" value="false" />
-    <property name="last_opened_file_path" value="E:/PhpStorm сайты/el-bio" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="list.type.of.created.stylesheet" value="CSS" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
@@ -103,6 +103,7 @@
       <workItem from="1601372865425" duration="3328000" />
       <workItem from="1601377856426" duration="11269000" />
       <workItem from="1601394173670" duration="21255000" />
+      <workItem from="1601562471980" duration="1024000" />
     </task>
     <servers />
   </component>

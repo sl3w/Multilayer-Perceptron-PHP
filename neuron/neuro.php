@@ -334,7 +334,7 @@ function setValueFuncAct($i, $j, $value)
 function goEpoch(&$weights, $numEpochOnIter = false)
 {
     if ($numEpochOnIter == -1) {
-        $fileName = 'tic-tac-toe.data';
+        $fileName = 'zoo.data';
 
         $inputData = array();
 
