@@ -241,7 +241,8 @@ $(function () {
             vAxis: {
                 title: 'Значение ошибки'
             },
-            backgroundColor: '#f1f8e9',
+            // backgroundColor: '#f1f8e9',
+            backgroundColor: '#ffffff',
             legend: {position: 'top'}
         };
 
