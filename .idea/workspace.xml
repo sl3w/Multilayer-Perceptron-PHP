@@ -40,6 +40,9 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GithubDefaultAccount">
+    <option name="defaultAccountId" value="13e6e41e-955c-47e4-b986-c9865c89df15" />
+  </component>
   <component name="ProjectId" id="1hHTARwYvRMEs4a7YvFCo3NuTsn" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
@@ -55,7 +58,7 @@
     <property name="WebServerToolWindowPanel.toolwindow.show.date" value="false" />
     <property name="WebServerToolWindowPanel.toolwindow.show.permissions" value="false" />
     <property name="WebServerToolWindowPanel.toolwindow.show.size" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/neuron" />
     <property name="list.type.of.created.stylesheet" value="CSS" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
@@ -63,18 +66,30 @@
     <property name="node.js.path.for.package.tslint" value="project" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
-    <property name="settings.editor.selected.configurable" value="duplicates.index" />
+    <property name="settings.editor.selected.configurable" value="org.jetbrains.plugins.github.ui.GithubSettingsConfigurable" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\leoni\Desktop\neuronochka\neuron" />
+      <recent name="D:\Учеба\Интеллектуальные системы\neuronochka\neuron" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\leoni\Desktop\neuronochka\neuron\examples" />
       <recent name="C:\Users\leoni\Desktop\neuronochka\neuron" />
       <recent name="D:\Учеба\Интеллектуальные системы\neuronochka\neuron" />
       <recent name="D:\Учеба\Интеллектуальные системы\neuronochka" />
     </key>
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="D:\Учеба\Интеллектуальные системы\neuronochka\neuron" />
-    </key>
+  </component>
+  <component name="RunManager">
+    <configuration default="true" type="PhpLocalRunConfigurationType" factoryName="PHP Console">
+      <CommandLine>
+        <PhpTestInterpreterSettings>
+          <option name="interpreterName" value="root@192.168.3.37:22 password" />
+        </PhpTestInterpreterSettings>
+      </CommandLine>
+      <method v="2" />
+    </configuration>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -124,31 +139,49 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="WindowStateProjectService">
+    <state x="540" y="187" key="#CLI_Interpreters" timestamp="1601646861918">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="540" y="187" key="#CLI_Interpreters/0.0.1920.1040@0.0.1920.1040" timestamp="1601646861918" />
     <state x="361" y="71" key="#Deployment" timestamp="1599864543267">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="361" y="71" key="#Deployment/0.0.1536.824@0.0.1536.824" timestamp="1599864543267" />
+    <state x="737" y="252" key="#Docker" timestamp="1601646847079">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="737" y="252" key="#Docker/0.0.1920.1040@0.0.1920.1040" timestamp="1601646847079" />
     <state x="345" y="58" key="#SSH_Configurations" timestamp="1599718860992">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="345" y="58" key="#SSH_Configurations/0.0.1536.824@0.0.1536.824" timestamp="1599718860992" />
-    <state x="528" y="214" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1601380015681">
-      <screen x="0" y="0" width="1536" height="824" />
-    </state>
-    <state x="528" y="214" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1536.824@0.0.1536.824" timestamp="1601380015681" />
-    <state x="740" y="275" key="FileChooserDialogImpl" timestamp="1601447353052">
+    <state x="540" y="187" key="#Servers" timestamp="1601646821031">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="740" y="275" key="FileChooserDialogImpl/0.0.1920.1040@0.0.1920.1040" timestamp="1601447353052" />
+    <state x="540" y="187" key="#Servers/0.0.1920.1040@0.0.1920.1040" timestamp="1601646821031" />
+    <state x="414" y="175" width="1092" height="714" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1601646895202">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="414" y="175" width="1092" height="714" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1601646895202" />
+    <state x="660" y="270" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1601630642743">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="528" y="214" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1536.824@0.0.1536.824" timestamp="1601380015681" />
+    <state x="660" y="270" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1920.1040@0.0.1920.1040" timestamp="1601630642743" />
+    <state x="740" y="275" key="FileChooserDialogImpl" timestamp="1601647317694">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="740" y="275" key="FileChooserDialogImpl/0.0.1920.1040@0.0.1920.1040" timestamp="1601647317694" />
     <state x="604" y="336" key="NewPhpFileDialog" timestamp="1601153110788">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="604" y="336" key="NewPhpFileDialog/0.0.1536.824@0.0.1536.824" timestamp="1601153110788" />
     <state x="755" y="424" key="NewPhpFileDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1599823169112" />
-    <state x="555" y="88" key="SettingsEditor" timestamp="1601120251566">
-      <screen x="0" y="0" width="1536" height="824" />
+    <state x="694" y="111" key="SettingsEditor" timestamp="1601647436656">
+      <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="555" y="88" key="SettingsEditor/0.0.1536.824@0.0.1536.824" timestamp="1601120251566" />
+    <state x="694" y="111" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1601647436656" />
     <state x="624" y="311" key="WebDeployment.AddServerDialog.v.1" timestamp="1599667119385">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
@@ -157,6 +190,10 @@
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="611" y="143" key="ftp.server.browser/0.0.1536.824@0.0.1536.824" timestamp="1599668207181" />
+    <state x="616" y="240" key="run.anything.popup" timestamp="1601646801169">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="616" y="240" key="run.anything.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1601646801169" />
     <state x="431" y="145" key="search.everywhere.popup" timestamp="1599684260211">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
