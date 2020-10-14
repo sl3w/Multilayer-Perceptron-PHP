@@ -1,0 +1,80 @@
+body {
+    display: flex;
+    font-family: monospace;
+    font-size: 14px;
+}
+
+div {
+    max-width: 100%;
+    display: flex;
+}
+
+.buttons {
+    flex-direction: column;
+    margin-right: 30px;
+    min-width: 270px;
+}
+
+.buttons button {
+    margin-top: 10px;
+    /*margin-bottom: 30px;*/
+}
+
+.errors {
+    max-height: 350px;
+    flex-direction: column;
+    margin-right: 30px;
+    /*overflow-y: scroll;*/
+}
+
+#errorsTable {
+    width: 500px;
+}
+
+#resultTable {
+    text-align: center;
+}
+
+/*.errors table {*/
+/*    width: 700px;*/
+/*}*/
+
+.errors td {
+    text-align: center;
+}
+
+button.test {
+    margin-bottom: 10px;
+}
+
+.buttons input:not([type=checkbox]) {
+    margin: 5px 0;
+}
+
+/*.answer, #curve_chart, .hideIterat, .line-chart, .stopParams {*/
+/*    margin-right: 0;*/
+/*}*/
+
+.wrapper, .line-chart {
+    flex-direction: column;
+}
+
+#hideIterat {
+    max-width: 50px;
+    text-align: center;
+    margin-left: 10px;
+}
+
+hr {
+    width: 100%;
+    margin: 10px 0;
+}
+
+.stopParams input:not(:last-child) {
+    margin-right: 10px;
+}
+
+.moments {
+    margin-top: 10px;
+    margin-right: 0;
+}

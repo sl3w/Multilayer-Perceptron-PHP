@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <title>Нейроночка</title>
+    <meta charset="UTF-8">
+
+    <link rel="stylesheet" href="mystyle.css">
+
+
+</head>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+<script type="text/javascript" src="script.js"></script>
+
+<div class="wrapper">
+    <div style="margin-right: 30px">
+        <div class="buttons">
+            <!--            <label>Кол-во скрытых слоев:</label>-->
+            <!--            <input id="hideLayCount" type="number" min="1" max="5" value="1">-->
+            <label>Кол-во нейронов на скрытом слое:</label>
+            <input id="hideLayNeuronCount" type="number" min="1" max="20" value="2">
+            <label>Размер окна:</label>
+            <input id="windowSize" type="number" min="1" max="10" value="3">
+            <button id="init">
+                Инициализация
+            </button>
+            <hr>
+            <label>Количество эпох за раз:</label>
+            <input id="countEpochs" type="number" min="0" step="100" value="50" max="1000">
+            <label>Коэффициент обучения:</label>
+            <input id="teachKoef" type="number" min="0" max="1" step="0.01" value="0.9">
+            <div class="dynamicTeachKoef">
+                <input id="dynamicTeachKoef" type="checkbox"><label for="dynamicTeachKoef">Изменять коэф.
+                обучения</label>
+            </div>
+            <div class="moments">
+                <input id="useMoments" type="checkbox"><label for="useMoments">Моменты</label>
+            </div>
+            <label>Коэффициент момента:</label>
+            <input id="momentsKoef" type="number" min="0" max="1" step="0.01" value="0.5">
+
+            <button id="teach" disabled>
+                Обучение
+            </button>
+
+            <hr>
+            <label>Тестовые данные:</label>
+            <input id="inputTest" type="text" value="48,49,50">
+
+            <button id="test" class="test" disabled>
+                Тест
+            </button>
+            <div class="answer">
+                <pre></pre>
+            </div>
+
+            <hr>
+            <label>Количество для прогноза:</label>
+            <input id="inputTesting" type="number" min="1" max="100" value="5">
+            <button id="testing" class="test" disabled>
+                Тест %
+            </button>
+            <div class="answer2">
+                <table id="resultTable" width="100%">
+                    <thead>
+                    <tr>
+                        <th>
+                            Ожидание
+                        </th>
+                        <th>
+                            Реальность
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <hr>
+        </div>
+
+        <div class="errors">
+            <div class="stopParams">
+                <label>Максимальное количество эпох:</label>
+                <input id="maxCountEpochs" type="number" min="0" step="100" value="1000" max="10000">
+                <label>Допустимое значение ошибки для выхода:</label>
+                <input id="stopErrorParam" type="number" min="0" value="0" max="1000" step="0.1">
+            </div>
+            <div style="display: flex; margin-top: 10px">
+                <input id="stopTeach" type="checkbox"><label for="stopTeach">Остановить принудительно</label>
+            </div>
+            <hr>
+            <table id="errorsTable">
+                <thead>
+                <tr>
+                    <th colspan="4">Ошибки сети</th>
+                </tr>
+                <tr>
+                    <th>
+                        № итер.
+                    </th>
+                    <th>
+                        Общее кол-во эпох
+                    </th>
+                    <th>
+                        Кол-во эпох за раз
+                    </th>
+                    <th>
+                        Коэф. обучения
+                    </th>
+                    <th>
+                        СКО
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="line-chart">
+            <div id="curve_chart" style="width: 680px; height: 500px"></div>
+            <div class="hideIterat" style="max-height: max-content">
+                <label>Скрыть первые итерации на графике: </label>
+                <input id="hideIterat" type="number" value="0" min="0" step="10">
+            </div>
+        </div>
+    </div>
+    <div>
+        <div class="weights">
+            <pre id="weights">Текущее значение весов:
+            </pre>
+        </div>
+    </div>
+</div>
+</body>
+</html>
