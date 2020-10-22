@@ -1,5 +1,5 @@
 <?php
-define("REAL_DATA", false);
+define("REAL_DATA", true);
 
 global $isTeach, $numPrimer, $teachKoef, $teachKoefStandart, $momentsKoef;
 global $hideLayCount, $hideLayNeuronCount, $outLayNeuronCount;
@@ -33,10 +33,46 @@ if ($do == 'init') {
     $inputData = array();
 
     if (REAL_DATA) {
-        //TODO: сделать реальные данные
+        $fileName = 'data/tesla.txt';
+        $countExamples = 240;
+
+        $handle = fopen($fileName, "r");
+
+        $sumx = 0;
+        $ii = 0;
+        while (!feof($handle)) {
+            $buffer = fgets($handle, 100);
+            $x = doubleval(trim($buffer));
+            if ($ii < $countExamples) {
+                $xs[] = $x;
+                $sumx += pow($x, 2);
+            } else {
+                $futureTestData[] = $x;
+            }
+            $ii++;
+        }
+        fclose($handle);
+        $sumx = sqrt($sumx);
+//        $sumx = 1;
+
+        foreach ($xs as $i => $x) {
+            $xs[$i] = $x / $sumx;
+        }
+
+        $windowSize = $_POST['windowSize'];
+        for ($i = 0; $i < count($xs) - $windowSize; $i++) {
+            $inputData[] = array(array_slice($xs, $i, $windowSize), array($xs[$i + $windowSize]));
+        }
+
+        foreach ($inputData as $i => $example) {
+            startExample($weights, $example[0], $example[1]);
+        }
+
+        $testData = array(array_slice($xs, count($xs) - $windowSize), $futureTestData[0] / $sumx, $futureTestData[0], -1);
+        $futureTestData = array_slice($futureTestData, 1);
     } else {
         $sumx = 0;
-        $countExamples = 100;
+        $countExamples = 50;
 
         for ($ii = 1; $ii <= $countExamples; $ii++) {
             $xs[] = $ii;
@@ -44,6 +80,7 @@ if ($do == 'init') {
             $sumx += pow($ii, 2);
         }
         $sumx = sqrt($sumx);
+//        $sumx = 1;
 
         foreach ($xs as $i => $x) {
             $xs[$i] = $x / $sumx;
@@ -61,7 +98,7 @@ if ($do == 'init') {
         $testData = array(array_slice($xs, count($xs) - $windowSize), ($countExamples + 1) / $sumx, $countExamples + 1, -1);
 
         $futureTestData = array();
-        for($jj = 0; $jj < 20; $jj++) {
+        for ($jj = 0; $jj < 20; $jj++) {
             $futureTestData[$jj] = $countExamples + $jj + 2;
         }
     }
@@ -166,9 +203,17 @@ if ($do == 'init') {
         $ansAr[] = $ans[0] * $kfNorm;
     }
 
+    $sum = 0;
+    foreach ($ansAr as $k => $answer) {
+        $sum += pow($answer / $kfNorm - $want[$k] / $kfNorm, 2);
+    }
+
+    $er = sqrt($sum / (count($ansAr) - 1));
+
     $res['testData'] = $testData;
     $res['ans'] = $ansAr;
     $res['want'] = $want;
+    $res['er'] = $er;
     echo json_encode($res);
 }
 

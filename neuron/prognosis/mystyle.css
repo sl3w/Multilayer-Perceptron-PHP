@@ -78,3 +78,8 @@ hr {
     margin-top: 10px;
     margin-right: 0;
 }
+
+.answer-er {
+    display: flex;
+    flex-direction: column;
+}

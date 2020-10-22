@@ -230,6 +230,8 @@ $(function () {
                     $("#resultTable tbody tr:last").after("<tr><td>" + result['want'][i] + "</td><td>" + result['ans'][i] + "</td></tr>");
                 }
 
+                $(".answer-er").html("<br><b>Погрешность прогнозирования:</b><span>" + result['er'] + "</span>");
+
 
                 $("#teach").attr("disabled", false);
                 $("#test").attr("disabled", false);
