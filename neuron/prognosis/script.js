@@ -47,6 +47,7 @@ $(function () {
                 $("#errorsTable tbody tr").remove();
                 $("#resultTable tbody tr").remove();
                 $(".answer pre").text("");
+                $(".answer-er").html("");
 
                 let er = result['error'];
 

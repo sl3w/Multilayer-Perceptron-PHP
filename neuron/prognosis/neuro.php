@@ -17,16 +17,16 @@ $hideLayCount = 1;
 $hideLayNeuronCount = $_POST['hideLayNeuronCount'];
 $outLayNeuronCount = 1;
 
-//$weights = array(
-//    "w111" => 0.5
-//, "w112" => 0.5
-//, "w113" => 0.5
-//, "w121" => 0.5
-//, "w122" => 0.5
-//, "w123" => 0.5
-//, "w211" => 0.5
-//, "w212" => 0.5
-//);
+$weights = array(
+    "w111" => 0.3362996079196686
+, "w112" => 0.3377145118255701
+, "w113" => -0.27497442335587663
+, "w121" => -0.12365506897850664
+, "w122" => 0.04498905807034537
+, "w123" => 0.2965310717916726
+, "w211" => 0.3956474828979222
+, "w212" => -0.10275207487994437
+);
 
 if ($do == 'init') {
     $numPrimer = 1;
@@ -34,7 +34,8 @@ if ($do == 'init') {
 
     if (REAL_DATA) {
         $fileName = 'data/tesla.txt';
-        $countExamples = 240;
+        $countExamples = 200;
+        $allMaxTeachCount = 240;
 
         $handle = fopen($fileName, "r");
 
@@ -43,11 +44,13 @@ if ($do == 'init') {
         while (!feof($handle)) {
             $buffer = fgets($handle, 100);
             $x = doubleval(trim($buffer));
-            if ($ii < $countExamples) {
-                $xs[] = $x;
-                $sumx += pow($x, 2);
-            } else {
-                $futureTestData[] = $x;
+            if ($ii >= $allMaxTeachCount - $countExamples) {
+                if ($ii < $allMaxTeachCount) {
+                    $xs[] = $x;
+                    $sumx += pow($x, 2);
+                } else {
+                    $futureTestData[] = $x;
+                }
             }
             $ii++;
         }
@@ -155,7 +158,7 @@ if ($do == 'init') {
 
     $er = calcNetworkError($answers, $ethalons);
 
-    $res['error'] = $er;
+    $res['error'] = round($er, 7);
     $res['weights'] = $weights;
     $res['dopWeights'] = $dopWeights;
     $res['weightsPast'] = $weightsPast;
@@ -213,7 +216,7 @@ if ($do == 'init') {
     $res['testData'] = $testData;
     $res['ans'] = $ansAr;
     $res['want'] = $want;
-    $res['er'] = $er;
+    $res['er'] = round($er, 7);
     echo json_encode($res);
 }
 

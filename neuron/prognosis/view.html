@@ -28,7 +28,7 @@
             </button>
             <hr>
             <label>Количество эпох за раз:</label>
-            <input id="countEpochs" type="number" min="0" step="100" value="50" max="1000">
+            <input id="countEpochs" type="number" min="0" step="100" value="100" max="1000">
             <label>Коэффициент обучения:</label>
             <input id="teachKoef" type="number" min="0" max="1" step="0.01" value="0.9">
             <div class="dynamicTeachKoef">
@@ -86,7 +86,7 @@
         <div class="errors">
             <div class="stopParams">
                 <label>Максимальное количество эпох:</label>
-                <input id="maxCountEpochs" type="number" min="0" step="100" value="1000" max="10000">
+                <input id="maxCountEpochs" type="number" min="0" step="100" value="15000" max="10000">
                 <label>Допустимое значение ошибки для выхода:</label>
                 <input id="stopErrorParam" type="number" min="0" value="0" max="1000" step="0.1">
             </div>
@@ -123,7 +123,7 @@
         </div>
 
         <div class="line-chart">
-            <div id="curve_chart" style="width: 680px; height: 500px"></div>
+            <div id="curve_chart" style="width: 1000px; height: 500px"></div>
             <div class="hideIterat" style="max-height: max-content">
                 <label>Скрыть первые итерации на графике: </label>
                 <input id="hideIterat" type="number" value="0" min="0" step="10">
