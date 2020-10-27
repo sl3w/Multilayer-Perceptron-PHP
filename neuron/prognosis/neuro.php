@@ -1,5 +1,5 @@
 <?php
-define("REAL_DATA", true);
+define("REAL_DATA", false);
 
 global $isTeach, $numPrimer, $teachKoef, $teachKoefStandart, $momentsKoef;
 global $hideLayCount, $hideLayNeuronCount, $outLayNeuronCount;
@@ -95,7 +95,7 @@ if ($do == 'init') {
         $futureTestData = array_slice($futureTestData, 1);
     } else {
         $sumx = 0;
-        $countExamples = 50;
+        $countExamples = 100;
 
         for ($ii = 1; $ii <= $countExamples; $ii++) {
             $xs[] = $ii;

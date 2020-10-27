@@ -20,7 +20,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7e256f0f-9792-4755-9b76-8a19d326dce0" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/neuron/prognosis/neuro.php" beforeDir="false" afterPath="$PROJECT_DIR$/neuron/prognosis/neuro.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -130,6 +132,7 @@
       <workItem from="1603347006811" duration="15732000" />
       <workItem from="1603438082804" duration="8001000" />
       <workItem from="1603461899719" duration="1384000" />
+      <workItem from="1603776262928" duration="1370000" />
     </task>
     <servers />
   </component>
